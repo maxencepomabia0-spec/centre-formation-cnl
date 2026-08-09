@@ -1,0 +1,321 @@
+/* =========================================================
+   CENTRE NATIONAL DE LEADERSHIP
+========================================================= */
+
+.leadership-section {
+  position: relative;
+
+  padding: 105px 0;
+
+  overflow: hidden;
+
+  background: #101318;
+
+  color: #ffffff;
+}
+
+
+/* ligne de séparation */
+
+.leadership-line {
+  position: absolute;
+
+  top: 0;
+  left: 8%;
+  right: 8%;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.leadership-label {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin-bottom: 22px;
+
+  color: #f5a623;
+
+  font-size: 0.7rem;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.14em;
+}
+
+.leadership-label span {
+  width: 28px;
+  height: 2px;
+
+  background: #f5a623;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.leadership-title {
+  max-width: 700px;
+
+  margin: 0;
+
+  font-size: clamp(
+    3rem,
+    5vw,
+    5.2rem
+  );
+
+  line-height: 0.96;
+
+  font-weight: 850;
+
+  letter-spacing: -0.06em;
+}
+
+.leadership-title span {
+  display: block;
+
+  color: #f5a623;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.leadership-description {
+  max-width: 620px;
+
+  margin-top: 27px;
+
+  color: rgba(255, 255, 255, 0.52);
+
+  font-size: 0.94rem;
+
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   POINTS
+========================================================= */
+
+.leadership-points {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px 25px;
+
+  margin-top: 32px;
+}
+
+.leadership-points div {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 0.73rem;
+}
+
+.leadership-points i {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 21px;
+  height: 21px;
+
+  border-radius: 50%;
+
+  background: rgba(245, 166, 35, 0.12);
+
+  color: #f5a623;
+
+  font-size: 0.7rem;
+}
+
+
+/* =========================================================
+   VISUEL
+========================================================= */
+
+.leadership-visual {
+  position: relative;
+
+  min-height: 310px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+/* énorme CNL en arrière-plan */
+
+.leadership-watermark {
+  position: absolute;
+
+  font-size: 12rem;
+
+  font-weight: 900;
+
+  line-height: 1;
+
+  letter-spacing: -0.1em;
+
+  color: rgba(255, 255, 255, 0.025);
+
+  user-select: none;
+}
+
+
+/* numéro */
+
+.leadership-number {
+  position: absolute;
+
+  top: 5px;
+  right: 5px;
+
+  font-size: 0.65rem;
+
+  color: rgba(255, 255, 255, 0.28);
+
+  letter-spacing: 0.15em;
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
+
+.leadership-card {
+  position: relative;
+
+  z-index: 2;
+
+  width: min(100%, 360px);
+
+  padding: 24px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 17px;
+
+  border: 1px solid rgba(255, 255, 255, 0.11);
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.075),
+      rgba(255, 255, 255, 0.025)
+    );
+
+  backdrop-filter: blur(20px);
+
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.35);
+
+  transform: rotate(3deg);
+
+  transition:
+    transform 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.leadership-card:hover {
+  transform: rotate(0deg) translateY(-5px);
+
+  border-color: rgba(245, 166, 35, 0.35);
+}
+
+
+/* logo */
+
+.leadership-card img {
+  width: 75px;
+  height: 75px;
+
+  object-fit: contain;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  padding: 5px;
+}
+
+
+/* texte */
+
+.leadership-card div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.leadership-card strong {
+  font-size: 1.4rem;
+
+  letter-spacing: -0.03em;
+}
+
+.leadership-card span {
+  color: rgba(255, 255, 255, 0.42);
+
+  font-size: 0.65rem;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+  .leadership-section {
+    padding: 80px 0;
+  }
+
+  .leadership-title {
+    font-size: 3.1rem;
+  }
+
+  .leadership-visual {
+    min-height: 260px;
+
+    margin-top: 20px;
+  }
+
+  .leadership-watermark {
+    font-size: 8rem;
+  }
+
+}

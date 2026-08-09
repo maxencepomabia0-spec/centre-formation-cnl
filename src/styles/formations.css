@@ -8,7 +8,7 @@
 
   padding: 120px 0;
 
-  background: #f6f6f3;
+  background: #eef0ef;
 
   color: #101318;
 }
@@ -118,29 +118,52 @@
   display: flex;
   flex-direction: column;
 
-  padding: 27px;
+  padding: 30px;
 
-  border: 1px solid rgba(16, 19, 24, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
 
-  border-radius: 22px;
+  background: #101318;
 
-  background: #ffffff;
+  color: #ffffff;
+
+  box-shadow:
+    0 12px 35px rgba(16, 19, 24, 0.12);
 
   overflow: hidden;
 
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+    transform 0.35s cubic-bezier(.2,.8,.2,1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
 }
+.formation-card::before {
+  content: "";
 
+  position: absolute;
+
+  top: 0;
+  left: 30px;
+  right: 30px;
+
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #f5a623,
+    transparent
+  );
+
+  opacity: 0.75;
+}
 .formation-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-10px);
 
-  border-color: rgba(245, 166, 35, 0.35);
+  border-color: rgba(245, 166, 35, 0.45);
 
   box-shadow:
-    0 25px 60px rgba(16, 19, 24, 0.10);
+    0 25px 60px rgba(16, 19, 24, 0.10),
+    0 0 0 1px rgba(245, 166, 35, 0.05);
 }
 
 
@@ -153,35 +176,39 @@
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 38px;
+  margin-bottom: 32px;
 }
 
 .formation-icon {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 15px;
+  border-radius: 16px;
 
   background: #101318;
 
   color: #f5a623;
 
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+
+  box-shadow:
+    0 10px 25px rgba(16, 19, 24, 0.15);
+
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
 }
+.formation-card:hover .formation-icon {
+  transform: rotate(-5deg) scale(1.05);
 
-.formation-number {
-  color: #bfc1c4;
+  background: #f5a623;
 
-  font-size: 0.68rem;
-  font-weight: 800;
-
-  letter-spacing: 0.1em;
+  color: #101318;
 }
-
 
 /* =========================================================
    CONTENU
@@ -192,7 +219,7 @@
 }
 
 .formation-category {
-  color: #b87908;
+  color: #f5a623;
 
   font-size: 0.68rem;
   font-weight: 800;
@@ -202,11 +229,13 @@
 }
 
 .formation-card h3 {
-  margin: 9px 0 13px;
+  margin: 9px 0 12px;
 
-  font-size: 1.55rem;
+  color: #ffffff;
 
-  line-height: 1.1;
+  font-size: 1.45rem;
+
+  line-height: 1.08;
 
   font-weight: 800;
 
@@ -216,13 +245,12 @@
 .formation-card p {
   margin: 0;
 
-  color: #74777d;
+  color: rgba(255, 255, 255, 0.52);
 
   font-size: 0.84rem;
 
   line-height: 1.7;
 }
-
 
 /* =========================================================
    META
@@ -237,7 +265,7 @@
   margin-top: 30px;
   padding-top: 18px;
 
-  border-top: 1px solid rgba(16, 19, 24, 0.07);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .formation-meta div {
@@ -245,15 +273,14 @@
   align-items: center;
   gap: 7px;
 
-  color: #777b81;
+  color: rgba(255, 255, 255, 0.48);
 
   font-size: 0.68rem;
 }
 
 .formation-meta i {
-  color: #d78d10;
+  color: #f5a623;
 }
-
 
 /* =========================================================
    LIEN
@@ -266,7 +293,7 @@
 
   margin-top: 23px;
 
-  color: #101318;
+  color: #ffffff;
 
   font-size: 0.76rem;
   font-weight: 800;
@@ -277,7 +304,7 @@
 }
 
 .formation-link:hover {
-  color: #c27e08;
+  color: #f5a623;
 }
 
 .formation-link span {
@@ -290,7 +317,7 @@
 
   border-radius: 50%;
 
-  background: #f4f4f1;
+  background: rgba(255, 255, 255, 0.08);
 
   transition:
     background 0.2s ease,
@@ -299,6 +326,8 @@
 
 .formation-link:hover span {
   background: #f5a623;
+
+  color: #101318;
 
   transform: rotate(45deg);
 }

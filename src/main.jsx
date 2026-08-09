@@ -9,6 +9,7 @@ import './index.css'
 import './styles/navbar.css'
 import App from './App.jsx'
 import './styles/Hero.css'
+import './styles/Leadership.css'
 import './styles/formations.css'
 
 
