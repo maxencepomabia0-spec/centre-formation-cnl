@@ -1,0 +1,421 @@
+/* =========================================================
+   FORMATIONS — CNL
+========================================================= */
+
+.formations-section {
+  position: relative;
+  overflow: hidden;
+
+  padding: 120px 0;
+
+  background: #f6f6f3;
+
+  color: #101318;
+}
+
+
+/* =========================================================
+   GRAND NUMÉRO EN ARRIÈRE-PLAN
+========================================================= */
+
+.formations-background-number {
+  position: absolute;
+
+  top: 40px;
+  right: -30px;
+
+  font-size: 18rem;
+  line-height: 1;
+
+  font-weight: 900;
+
+  color: rgba(0, 0, 0, 0.025);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   EN-TÊTE
+========================================================= */
+
+.formations-heading {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 50px;
+
+  margin-bottom: 55px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 17px;
+
+  color: #d78d10;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.section-label span {
+  width: 25px;
+  height: 2px;
+
+  background: #f5a623;
+}
+
+.formations-heading h2 {
+  max-width: 760px;
+
+  margin: 0;
+
+  font-size: clamp(2.7rem, 5vw, 5rem);
+
+  line-height: 0.98;
+
+  font-weight: 850;
+
+  letter-spacing: -0.055em;
+}
+
+.formations-heading h2 span {
+  color: #b87908;
+}
+
+.formations-heading > p {
+  max-width: 360px;
+
+  margin: 0;
+
+  color: #6d7178;
+
+  font-size: 0.92rem;
+
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
+
+.formation-card {
+  position: relative;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 27px;
+
+  border: 1px solid rgba(16, 19, 24, 0.08);
+
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.formation-card:hover {
+  transform: translateY(-8px);
+
+  border-color: rgba(245, 166, 35, 0.35);
+
+  box-shadow:
+    0 25px 60px rgba(16, 19, 24, 0.10);
+}
+
+
+/* =========================================================
+   PARTIE SUPÉRIEURE
+========================================================= */
+
+.formation-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 38px;
+}
+
+.formation-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background: #101318;
+
+  color: #f5a623;
+
+  font-size: 1.15rem;
+}
+
+.formation-number {
+  color: #bfc1c4;
+
+  font-size: 0.68rem;
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
+.formation-card-content {
+  flex: 1;
+}
+
+.formation-category {
+  color: #b87908;
+
+  font-size: 0.68rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.formation-card h3 {
+  margin: 9px 0 13px;
+
+  font-size: 1.55rem;
+
+  line-height: 1.1;
+
+  font-weight: 800;
+
+  letter-spacing: -0.035em;
+}
+
+.formation-card p {
+  margin: 0;
+
+  color: #74777d;
+
+  font-size: 0.84rem;
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+.formation-meta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 16px;
+
+  margin-top: 30px;
+  padding-top: 18px;
+
+  border-top: 1px solid rgba(16, 19, 24, 0.07);
+}
+
+.formation-meta div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #777b81;
+
+  font-size: 0.68rem;
+}
+
+.formation-meta i {
+  color: #d78d10;
+}
+
+
+/* =========================================================
+   LIEN
+========================================================= */
+
+.formation-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 23px;
+
+  color: #101318;
+
+  font-size: 0.76rem;
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.formation-link:hover {
+  color: #c27e08;
+}
+
+.formation-link span {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f4f4f1;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.formation-link:hover span {
+  background: #f5a623;
+
+  transform: rotate(45deg);
+}
+
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.formations-cta {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-top: 55px;
+  padding: 25px 28px;
+
+  border-radius: 18px;
+
+  background: #101318;
+
+  color: white;
+
+  overflow: hidden;
+}
+
+.formations-cta::after {
+  content: "";
+
+  position: absolute;
+
+  width: 250px;
+  height: 250px;
+
+  right: -100px;
+  top: -130px;
+
+  border-radius: 50%;
+
+  border: 1px solid rgba(245, 166, 35, 0.3);
+}
+
+.formations-cta > div {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.formations-cta span {
+  color: rgba(255, 255, 255, 0.48);
+
+  font-size: 0.68rem;
+}
+
+.formations-cta strong {
+  font-size: 0.95rem;
+}
+
+.formations-cta-button {
+  position: relative;
+  z-index: 2;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 17px;
+
+  border-radius: 999px;
+
+  background: #f5a623;
+
+  color: #101318;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  text-decoration: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+  .formations-section {
+    padding: 85px 0;
+  }
+
+  .formations-heading {
+    display: block;
+
+    margin-bottom: 38px;
+  }
+
+  .formations-heading h2 {
+    font-size: 3rem;
+  }
+
+  .formations-heading > p {
+    margin-top: 22px;
+  }
+
+  .formations-cta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .formations-background-number {
+    font-size: 10rem;
+  }
+
+}

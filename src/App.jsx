@@ -1,13 +1,14 @@
 import Navbar from "./components/navbar/navbar";
 import Hero from "./components/Hero/Hero";
+import Formation from "./components/formations/formations";
 
 function App() {
   return (
     <>
       <Navbar />
 
-    <Hero />
-    
+      <Hero />
+
       <main>
         <section
           id="accueil"
@@ -16,6 +17,8 @@ function App() {
           <h1>Centre National de Leadership</h1>
         </section>
       </main>
+
+      <Formation />
     </>
   );
 }
