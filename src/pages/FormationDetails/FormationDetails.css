@@ -1,0 +1,402 @@
+.formation-details-page {
+  background: #eef0ef;
+  color: #101318;
+}
+
+
+/* ================================
+   HERO
+================================ */
+
+.formation-details-hero {
+  padding: 150px 0 90px;
+
+  background: #101318;
+
+  color: white;
+}
+
+.formation-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 55px;
+
+  color: rgba(255,255,255,.4);
+
+  font-size: .7rem;
+}
+
+.formation-breadcrumb i {
+  color: #f5a623;
+}
+
+.details-category {
+  color: #f5a623;
+
+  font-size: .7rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+
+.formation-details-hero h1 {
+  max-width: 800px;
+
+  margin: 15px 0 25px;
+
+  font-size: clamp(3.5rem, 7vw, 7rem);
+
+  line-height: .9;
+
+  font-weight: 850;
+
+  letter-spacing: -.06em;
+}
+
+.formation-details-hero h1 span {
+  color: #f5a623;
+}
+
+.formation-details-hero p {
+  max-width: 650px;
+
+  color: rgba(255,255,255,.5);
+
+  line-height: 1.8;
+
+  font-size: .95rem;
+}
+
+
+/* ================================
+   INFO CARD
+================================ */
+
+.formation-info-card {
+  padding: 25px;
+
+  border: 1px solid rgba(255,255,255,.1);
+
+  border-radius: 20px;
+
+  background: rgba(255,255,255,.04);
+
+  backdrop-filter: blur(15px);
+}
+
+.formation-info-card div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 16px 0;
+
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.formation-info-card div:last-child {
+  border-bottom: 0;
+}
+
+.formation-info-card span {
+  color: rgba(255,255,255,.4);
+
+  font-size: .65rem;
+}
+
+.formation-info-card strong {
+  font-size: .85rem;
+}
+
+
+/* ================================
+   CONTENT
+================================ */
+
+.formation-details-content {
+  padding: 100px 0;
+}
+
+.formation-content-block {
+  margin-bottom: 70px;
+}
+
+.content-label {
+  display: block;
+
+  margin-bottom: 15px;
+
+  color: #b87908;
+
+  font-size: .68rem;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: .13em;
+}
+
+.formation-content-block h2 {
+  max-width: 700px;
+
+  margin-bottom: 20px;
+
+  font-size: clamp(2rem,4vw,3.5rem);
+
+  line-height: 1;
+
+  letter-spacing: -.05em;
+}
+
+.formation-content-block p {
+  max-width: 650px;
+
+  color: #73777c;
+
+  font-size: .9rem;
+
+  line-height: 1.8;
+}
+
+
+/* ================================
+   PROGRAMME
+================================ */
+
+.program-list {
+  margin-top: 30px;
+
+  border-top: 1px solid rgba(16,19,24,.1);
+}
+
+.program-list div {
+  display: grid;
+
+  grid-template-columns: 50px 1fr 30px;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 20px 5px;
+
+  border-bottom: 1px solid rgba(16,19,24,.1);
+
+  transition:
+    padding .25s ease,
+    color .25s ease;
+}
+
+.program-list div:hover {
+  padding-left: 15px;
+
+  color: #b87908;
+}
+
+.program-list span {
+  color: #b87908;
+
+  font-size: .7rem;
+
+  font-weight: 800;
+}
+
+.program-list strong {
+  font-size: .85rem;
+}
+
+.program-list i {
+  font-size: .8rem;
+}
+
+
+/* ================================
+   PDF
+================================ */
+
+.course-document {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 22px;
+
+  border-radius: 18px;
+
+  background: #101318;
+
+  color: white;
+}
+
+.document-icon {
+  width: 50px;
+  height: 50px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: rgba(245,166,35,.12);
+
+  color: #f5a623;
+
+  font-size: 1.3rem;
+}
+
+.course-document div:nth-child(2) {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.course-document span {
+  color: #f5a623;
+
+  font-size: .65rem;
+
+  text-transform: uppercase;
+}
+
+.course-document strong {
+  font-size: .85rem;
+}
+
+.course-document small {
+  color: rgba(255,255,255,.4);
+
+  font-size: .65rem;
+}
+
+
+/* ================================
+   INSCRIPTION
+================================ */
+
+.registration-card {
+  position: sticky;
+
+  top: 110px;
+
+  padding: 30px;
+
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 60px rgba(16,19,24,.08);
+}
+
+.registration-card h2 {
+  margin: 0 0 15px;
+
+  font-size: 2rem;
+
+  line-height: 1;
+
+  letter-spacing: -.045em;
+}
+
+.registration-card p {
+  margin-bottom: 25px;
+
+  color: #777;
+
+  font-size: .82rem;
+
+  line-height: 1.7;
+}
+
+.registration-whatsapp {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 15px;
+
+  border-radius: 12px;
+
+  background: #101318;
+
+  color: white;
+
+  font-size: .72rem;
+
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    transform .25s ease,
+    background .25s ease;
+}
+
+.registration-whatsapp:hover {
+  transform: translateY(-3px);
+
+  background: #f5a623;
+
+  color: #101318;
+}
+
+.registration-note {
+  display: flex;
+
+  gap: 8px;
+
+  margin-top: 20px;
+
+  color: #999;
+
+  font-size: .65rem;
+
+  line-height: 1.5;
+}
+
+.registration-note i {
+  color: #b87908;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 767px) {
+
+  .formation-details-hero {
+    padding: 120px 0 70px;
+  }
+
+  .formation-details-hero h1 {
+    font-size: 3.6rem;
+  }
+
+  .formation-details-content {
+    padding: 70px 0;
+  }
+
+  .registration-card {
+    position: relative;
+
+    top: auto;
+  }
+
+}
