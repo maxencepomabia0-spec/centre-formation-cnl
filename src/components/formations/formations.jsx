@@ -1,72 +1,19 @@
+import { Link } from "react-router-dom";
+import formations from "../../data/formations";
+
 function Formations() {
-  const formations = [
-    {
-      icon: "bi-building",
-      category: "Génie civil",
-      title: "Architecture & conception",
-      description:
-        "Apprenez les bases de la conception architecturale et développez vos compétences sur les outils professionnels.",
-      level: "Débutant → Avancé",
-      duration: "3 mois",
-    },
-
-    {
-      icon: "bi-rulers",
-      category: "Génie civil",
-      title: "Bâtiment & construction",
-      description:
-        "Maîtrisez les principes essentiels de la construction, de la préparation du projet jusqu'au suivi des travaux.",
-      level: "Débutant → Avancé",
-      duration: "4 mois",
-    },
-
-    {
-      icon: "bi-pc-display",
-      category: "Logiciels",
-      title: "AutoCAD & DAO",
-      description:
-        "Apprenez à réaliser des plans techniques professionnels et à travailler efficacement avec les outils de conception assistée.",
-      level: "Débutant → Avancé",
-      duration: "2 mois",
-    },
-
-    {
-      icon: "bi-boxes",
-      category: "BIM",
-      title: "Revit & modélisation",
-      description:
-        "Découvrez la modélisation BIM et apprenez à concevoir des projets de construction en trois dimensions.",
-      level: "Intermédiaire",
-      duration: "3 mois",
-    },
-
-    {
-      icon: "bi-map",
-      category: "Topographie",
-      title: "Topographie",
-      description:
-        "Développez les compétences nécessaires pour comprendre les relevés, mesures et travaux topographiques.",
-      level: "Débutant → Avancé",
-      duration: "3 mois",
-    },
-
-    {
-      icon: "bi-calculator",
-      category: "Technique",
-      title: "Étude & dimensionnement",
-      description:
-        "Approfondissez les méthodes d'étude, de calcul et de dimensionnement appliquées aux projets de construction.",
-      level: "Avancé",
-      duration: "4 mois",
-    },
-  ];
 
   return (
     <section className="formations-section" id="formations">
 
+      {/* =========================
+          NUMÉRO ARRIÈRE-PLAN
+      ========================== */}
+
       <div className="formations-background-number">
-        06
+        04
       </div>
+
 
       <div className="container">
 
@@ -77,6 +24,7 @@ function Formations() {
         <div className="formations-heading">
 
           <div>
+
             <div className="section-label">
               <span></span>
               Nos formations
@@ -86,19 +34,22 @@ function Formations() {
               Développez des compétences
               <span> qui construisent l'avenir.</span>
             </h2>
+
           </div>
 
+
           <p>
-            Des formations pratiques conçues pour vous permettre
-            de développer des compétences directement applicables
-            dans le monde professionnel.
+            Des formations professionnelles conçues pour
+            développer des compétences directement applicables
+            dans le secteur du génie civil, de l'architecture
+            et de la gestion de projets.
           </p>
 
         </div>
 
 
         {/* =========================
-            GRILLE
+            GRILLE DES FORMATIONS
         ========================== */}
 
         <div className="row g-3">
@@ -106,68 +57,120 @@ function Formations() {
           {formations.map((formation, index) => (
 
             <div
-              className="col-lg-4 col-md-6"
-              key={index}
+              className="col-lg-6"
+              key={formation.id}
             >
 
               <article className="formation-card">
 
+                {/* TOP */}
+
                 <div className="formation-card-top">
 
                   <div className="formation-icon">
+
                     <i className={`bi ${formation.icon}`}></i>
+
                   </div>
 
+
                   <span className="formation-number">
-                    0{index + 1}
+
+                    {String(index + 1).padStart(2, "0")}
+
                   </span>
 
                 </div>
 
 
+                {/* CONTENU */}
+
                 <div className="formation-card-content">
 
                   <span className="formation-category">
-                    {formation.category}
+
+                    {formation.filiere}
+
                   </span>
+
 
                   <h3>
                     {formation.title}
                   </h3>
 
+
                   <p>
-                    {formation.description}
+                    Formation professionnelle orientée vers
+                    la maîtrise des outils et compétences
+                    nécessaires dans le domaine.
                   </p>
 
                 </div>
 
 
+                {/* META */}
+
                 <div className="formation-meta">
 
                   <div>
+
                     <i className="bi bi-bar-chart"></i>
+
                     {formation.level}
+
                   </div>
 
+
                   <div>
+
                     <i className="bi bi-clock"></i>
+
                     {formation.duration}
+
                   </div>
 
                 </div>
 
 
-                <a
-                  href="#inscription"
+                {/* LOGICIELS */}
+
+                <div className="formation-software-preview">
+
+                  {formation.logiciels.slice(0, 3).map(
+                    (logiciel) => (
+
+                      <span key={logiciel}>
+                        {logiciel}
+                      </span>
+
+                    )
+                  )}
+
+                  {formation.logiciels.length > 3 && (
+                    <span>
+                      +{formation.logiciels.length - 3}
+                    </span>
+                  )}
+
+                </div>
+
+
+                {/* LIEN */}
+
+                <Link
+                  to={`/formation/${formation.slug}`}
                   className="formation-link"
                 >
+
                   Voir la formation
 
                   <span>
+
                     <i className="bi bi-arrow-up-right"></i>
+
                   </span>
 
-                </a>
+                </Link>
 
               </article>
 
@@ -185,19 +188,29 @@ function Formations() {
         <div className="formations-cta">
 
           <div>
-            <span>Une formation spécifique vous intéresse ?</span>
+
+            <span>
+              Une formation spécifique vous intéresse ?
+            </span>
 
             <strong>
               Contactez directement notre équipe.
             </strong>
+
           </div>
 
+
           <a
-            href="#contact"
+            href="https://wa.me/242064490583"
+            target="_blank"
+            rel="noreferrer"
             className="formations-cta-button"
           >
+
             Nous contacter
-            <i className="bi bi-arrow-up-right"></i>
+
+            <i className="bi bi-whatsapp"></i>
+
           </a>
 
         </div>

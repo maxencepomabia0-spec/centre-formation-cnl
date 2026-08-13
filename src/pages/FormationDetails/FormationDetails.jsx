@@ -1,42 +1,89 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import formations from "../../data/formations";
+import "./FormationDetails.css";
 
 function FormationDetails() {
+
   const { slug } = useParams();
 
+  const formation = formations.find(
+    (item) => item.slug === slug
+  );
+
+  if (!formation) {
+    return (
+      <main className="formation-not-found">
+        <div>
+          <span>404</span>
+          <h1>Formation introuvable</h1>
+
+          <p>Slug demandé: <strong>{slug}</strong></p>
+
+          <p>Slugs disponibles: <strong>{formations.map(f => f.slug).join(", ")}</strong></p>
+
+          <Link to="/" className="back-home">
+            Retour à l'accueil
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="formation-details-page">
+    <main className="formation-details">
 
-      {/* HERO DE LA FORMATION */}
+      {/* ==============================
+          HERO
+      ============================== */}
 
-      <section className="formation-details-hero">
+      <section className="formation-hero">
+
+        <div className="formation-hero-grid"></div>
 
         <div className="container">
 
           <div className="formation-breadcrumb">
-            Accueil
+
+            <Link to="/">
+              Accueil
+            </Link>
+
             <i className="bi bi-chevron-right"></i>
-            Formations
+
+            <Link to="/#formations">
+              Formations
+            </Link>
+
             <i className="bi bi-chevron-right"></i>
-            {slug}
+
+            <span>
+              {formation.title}
+            </span>
+
           </div>
 
-          <div className="row align-items-end g-5">
+
+          <div className="row align-items-end formation-hero-row">
 
             <div className="col-lg-8">
 
-              <span className="details-category">
-                Génie civil
-              </span>
+              <div className="formation-label">
+
+                <span className="formation-line"></span>
+
+                {formation.filiere}
+
+              </div>
+
 
               <h1>
-                Architecture &
-                <span> conception</span>
+                {formation.title}
               </h1>
 
-              <p>
-                Développez vos compétences en architecture,
-                conception et utilisation des outils professionnels
-                nécessaires aux projets de construction.
+
+              <p className="formation-intro">
+                Formation professionnelle du Club National
+                de Logiciels &amp; Génie Civil.
               </p>
 
             </div>
@@ -44,22 +91,13 @@ function FormationDetails() {
 
             <div className="col-lg-4">
 
-              <div className="formation-info-card">
+              <div className="formation-code">
 
-                <div>
-                  <span>Durée</span>
-                  <strong>3 mois</strong>
-                </div>
+                <span>CODE</span>
 
-                <div>
-                  <span>Niveau</span>
-                  <strong>Débutant → Avancé</strong>
-                </div>
-
-                <div>
-                  <span>Format</span>
-                  <strong>Présentiel</strong>
-                </div>
+                <strong>
+                  {formation.code}
+                </strong>
 
               </div>
 
@@ -72,9 +110,67 @@ function FormationDetails() {
       </section>
 
 
-      {/* CONTENU */}
+      {/* ==============================
+          INFORMATIONS
+      ============================== */}
 
-      <section className="formation-details-content">
+      <section className="formation-meta-section">
+
+        <div className="container">
+
+          <div className="formation-meta-grid">
+
+            <div className="meta-card">
+
+              <span>VERSION</span>
+
+              <strong>
+                {formation.version}
+              </strong>
+
+            </div>
+
+
+            <div className="meta-card">
+
+              <span>NIVEAU</span>
+
+              <strong>
+                {formation.level}
+              </strong>
+
+            </div>
+
+
+            <div className="meta-card">
+
+              <span>DURÉE</span>
+
+              <strong>
+                {formation.duration}
+              </strong>
+
+            </div>
+
+
+            <div className="meta-card meta-icon">
+
+              <i className={`bi ${formation.icon}`}></i>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* ==============================
+          LOGICIELS
+      ============================== */}
+
+      <section className="formation-content">
 
         <div className="container">
 
@@ -82,134 +178,146 @@ function FormationDetails() {
 
             <div className="col-lg-8">
 
-              <div className="formation-content-block">
+              <div className="content-heading">
 
-                <span className="content-label">
-                  Présentation
+                <span>
+                  // LOGICIELS ENSEIGNÉS
                 </span>
 
                 <h2>
-                  Une formation pensée pour le terrain.
+                  Les outils que vous allez maîtriser.
                 </h2>
-
-                <p>
-                  Cette formation permet aux apprenants de
-                  développer des compétences pratiques et
-                  professionnelles adaptées aux exigences
-                  du secteur du bâtiment et de la construction.
-                </p>
 
               </div>
 
 
-              {/* PROGRAMME */}
+              <div className="software-list">
 
-              <div className="formation-content-block">
+                {formation.logiciels.map((logiciel, index) => (
 
-                <span className="content-label">
-                  Programme
-                </span>
+                  <div
+                    className="software-item"
+                    key={logiciel}
+                  >
 
-                <h2>
-                  Ce que vous allez apprendre
-                </h2>
+                    <span className="software-number">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
 
-                <div className="program-list">
+                    <strong>
+                      {logiciel}
+                    </strong>
 
-                  <div>
-                    <span>01</span>
-                    <strong>Introduction à l'architecture</strong>
                     <i className="bi bi-arrow-up-right"></i>
+
                   </div>
 
-                  <div>
-                    <span>02</span>
-                    <strong>Lecture et réalisation de plans</strong>
-                    <i className="bi bi-arrow-up-right"></i>
-                  </div>
-
-                  <div>
-                    <span>03</span>
-                    <strong>Conception de projets</strong>
-                    <i className="bi bi-arrow-up-right"></i>
-                  </div>
-
-                  <div>
-                    <span>04</span>
-                    <strong>Outils professionnels</strong>
-                    <i className="bi bi-arrow-up-right"></i>
-                  </div>
-
-                </div>
-
-              </div>
-
-
-              {/* COURS PDF */}
-
-              <div className="course-document">
-
-                <div className="document-icon">
-                  <i className="bi bi-file-earmark-pdf"></i>
-                </div>
-
-                <div>
-                  <span>Support de formation</span>
-
-                  <strong>
-                    Cours Architecture & conception
-                  </strong>
-
-                  <small>
-                    Le document sera disponible prochainement.
-                  </small>
-                </div>
+                ))}
 
               </div>
 
             </div>
 
 
-            {/* INSCRIPTION */}
+            {/* ==============================
+                INSCRIPTION
+            ============================== */}
 
             <div className="col-lg-4">
 
-              <aside className="registration-card">
+              <aside className="formation-action">
 
-                <span className="content-label">
-                  Inscription
+                <span className="action-label">
+                  REJOINDRE LA FORMATION
                 </span>
 
                 <h2>
-                  Rejoignez cette formation.
+                  Prêt à commencer ?
                 </h2>
 
                 <p>
-                  Vous souhaitez participer à cette formation ?
-                  Envoyez-nous vos informations.
+                  Inscrivez-vous auprès du CNL pour
+                  rejoindre cette filière.
                 </p>
+
+
+                <Link
+                  to={`/inscription?formation=${formation.slug}`}
+                  className="action-button"
+                >
+
+                  Je m'inscris
+
+                  <i className="bi bi-arrow-up-right"></i>
+
+                </Link>
+
 
                 <a
                   href="https://wa.me/242064490583"
                   target="_blank"
                   rel="noreferrer"
-                  className="registration-whatsapp"
+                  className="whatsapp-button"
                 >
+
                   <i className="bi bi-whatsapp"></i>
 
-                  S'inscrire via WhatsApp
+                  Contacter sur WhatsApp
 
-                  <i className="bi bi-arrow-up-right"></i>
                 </a>
 
-                <div className="registration-note">
+
+                <div className="action-note">
+
                   <i className="bi bi-shield-check"></i>
 
-                  Vos informations seront traitées
-                  par notre équipe.
+                  <span>
+                    L'accès aux supports de cours est
+                    réservé aux membres validés par le centre.
+                  </span>
+
                 </div>
 
               </aside>
+
+            </div>
+
+          </div>
+
+
+          {/* ==============================
+              COURS
+          ============================== */}
+
+          <div className="course-access">
+
+            <div className="course-icon">
+
+              <i className="bi bi-file-earmark-pdf"></i>
+
+            </div>
+
+
+            <div className="course-info">
+
+              <span>
+                SUPPORT DE FORMATION
+              </span>
+
+              <strong>
+                Cours {formation.title}
+              </strong>
+
+              <small>
+                Accès réservé aux membres validés.
+              </small>
+
+            </div>
+
+
+            <div className="course-lock">
+
+              <i className="bi bi-lock-fill"></i>
 
             </div>
 
