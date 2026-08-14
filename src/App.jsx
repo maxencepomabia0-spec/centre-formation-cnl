@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Inscription from "./page/inscription";
 import Navbar from "./components/navbar/navbar";
 import Hero from "./components/Hero/Hero";
 import Leadership from "./components/Leadership/Leadership";
@@ -14,6 +15,7 @@ function App() {
       <Navbar />
 
       <Routes>
+        
 
         {/* PAGE D'ACCUEIL */}
         <Route
@@ -32,7 +34,10 @@ function App() {
           path="/formation/:slug"
           element={<FormationDetails />}
         />
-
+<Route
+  path="/inscription"
+  element={<Inscription />}
+/>
       </Routes>
 
     </BrowserRouter>

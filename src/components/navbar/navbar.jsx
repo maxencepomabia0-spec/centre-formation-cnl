@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -53,12 +55,12 @@ function Navbar() {
             </li>
 
             <li className="nav-item ms-lg-3 mt-2 mt-lg-0">
-              <a
+              <Link
                 className="btn btn-warning fw-semibold px-4"
-                href="#inscription"
+                to="/inscription"
               >
                 S'inscrire
-              </a>
+              </Link>
             </li>
 
           </ul>
