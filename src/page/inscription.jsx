@@ -2,7 +2,6 @@ import { useSearchParams, Link } from "react-router-dom";
 import formations from "../data/formations";
 import "./inscription.css";
 
-
 function Inscription() {
   const [searchParams] = useSearchParams();
 
@@ -17,16 +16,22 @@ function Inscription() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    const nom = formData.get("nom");
-    const prenom = formData.get("prenom");
-    const telephone = formData.get("telephone");
-    const email = formData.get("email");
-    const ville = formData.get("ville");
-    const profil = formData.get("profil");
-    const logiciel = formData.get("logiciel");
-    const message = formData.get("message");
+    const nom = formData.get("nom")?.toString().trim();
+    const prenom = formData.get("prenom")?.toString().trim();
+    const telephone = formData.get("telephone")?.toString().trim();
+    const email = formData.get("email")?.toString().trim();
+    const ville = formData.get("ville")?.toString().trim();
+    const profil = formData.get("profil")?.toString().trim();
+    const logiciel = formData.get("logiciel")?.toString().trim();
+    const message = formData.get("message")?.toString().trim();
+
+    if (!formation) {
+      alert("La formation sélectionnée est introuvable.");
+      return;
+    }
 
     const texte = `
 Bonjour CNL,
@@ -39,8 +44,9 @@ Téléphone : ${telephone}
 E-mail : ${email}
 Ville : ${ville}
 Profil : ${profil}
+
+Formation : ${formation.title}
 Logiciel souhaité : ${logiciel}
-Formation : ${formation?.title || "À préciser"}
 
 Message :
 ${message || "Aucun message supplémentaire."}
@@ -49,11 +55,15 @@ ${message || "Aucun message supplémentaire."}
     const whatsappUrl =
       `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(texte)}`;
 
-    window.open(whatsappUrl, "_blank");
+    window.location.href = whatsappUrl;
   };
 
   return (
     <main className="inscription-page">
+
+      {/* =========================
+          HERO
+      ========================== */}
 
       <section className="inscription-hero">
 
@@ -77,8 +87,8 @@ ${message || "Aucun message supplémentaire."}
             </h1>
 
             <p>
-              Remplissez vos informations et contactez directement
-              notre équipe sur WhatsApp pour finaliser votre demande.
+              Remplissez vos informations puis transmettez
+              directement votre demande à notre équipe sur WhatsApp.
             </p>
 
           </div>
@@ -87,6 +97,10 @@ ${message || "Aucun message supplémentaire."}
 
       </section>
 
+
+      {/* =========================
+          FORMULAIRE
+      ========================== */}
 
       <section className="inscription-content">
 
@@ -109,9 +123,12 @@ ${message || "Aucun message supplémentaire."}
 
                   <div className="col-md-6">
 
-                    <label>Nom *</label>
+                    <label htmlFor="nom">
+                      Nom *
+                    </label>
 
                     <input
+                      id="nom"
                       type="text"
                       name="nom"
                       placeholder="Votre nom"
@@ -120,11 +137,15 @@ ${message || "Aucun message supplémentaire."}
 
                   </div>
 
+
                   <div className="col-md-6">
 
-                    <label>Prénom *</label>
+                    <label htmlFor="prenom">
+                      Prénom *
+                    </label>
 
                     <input
+                      id="prenom"
                       type="text"
                       name="prenom"
                       placeholder="Votre prénom"
@@ -133,11 +154,15 @@ ${message || "Aucun message supplémentaire."}
 
                   </div>
 
+
                   <div className="col-md-6">
 
-                    <label>Téléphone *</label>
+                    <label htmlFor="telephone">
+                      Téléphone *
+                    </label>
 
                     <input
+                      id="telephone"
                       type="tel"
                       name="telephone"
                       placeholder="+242 ..."
@@ -146,11 +171,15 @@ ${message || "Aucun message supplémentaire."}
 
                   </div>
 
+
                   <div className="col-md-6">
 
-                    <label>E-mail *</label>
+                    <label htmlFor="email">
+                      E-mail *
+                    </label>
 
                     <input
+                      id="email"
                       type="email"
                       name="email"
                       placeholder="vous@example.com"
@@ -159,11 +188,15 @@ ${message || "Aucun message supplémentaire."}
 
                   </div>
 
+
                   <div className="col-md-6">
 
-                    <label>Ville *</label>
+                    <label htmlFor="ville">
+                      Ville *
+                    </label>
 
                     <input
+                      id="ville"
                       type="text"
                       name="ville"
                       placeholder="Brazzaville, Pointe-Noire..."
@@ -172,23 +205,30 @@ ${message || "Aucun message supplémentaire."}
 
                   </div>
 
+
                   <div className="col-md-6">
 
-                    <label>Profil *</label>
+                    <label htmlFor="profil">
+                      Profil *
+                    </label>
 
                     <select
+                      id="profil"
                       name="profil"
                       required
                     >
                       <option value="">
                         Choisir
                       </option>
+
                       <option value="Étudiant">
                         Étudiant
                       </option>
+
                       <option value="Professionnel">
                         Professionnel
                       </option>
+
                       <option value="Passionné / Autodidacte">
                         Passionné / Autodidacte
                       </option>
@@ -207,21 +247,28 @@ ${message || "Aucun message supplémentaire."}
 
                   <div className="col-12">
 
-                    <label>Formation sélectionnée</label>
+                    <label htmlFor="formation">
+                      Formation sélectionnée
+                    </label>
 
                     <input
+                      id="formation"
                       type="text"
-                      value={formation?.title || ""}
+                      value={formation?.title || "Formation introuvable"}
                       readOnly
                     />
 
                   </div>
 
+
                   <div className="col-12">
 
-                    <label>Logiciel souhaité *</label>
+                    <label htmlFor="logiciel">
+                      Logiciel souhaité *
+                    </label>
 
                     <select
+                      id="logiciel"
                       name="logiciel"
                       required
                     >
@@ -231,25 +278,27 @@ ${message || "Aucun message supplémentaire."}
                       </option>
 
                       {formation?.logiciels.map((logiciel) => (
-
                         <option
                           key={logiciel}
                           value={logiciel}
                         >
                           {logiciel}
                         </option>
-
                       ))}
 
                     </select>
 
                   </div>
 
+
                   <div className="col-12">
 
-                    <label>Message</label>
+                    <label htmlFor="message">
+                      Message
+                    </label>
 
                     <textarea
+                      id="message"
                       name="message"
                       rows="5"
                       placeholder="Votre message..."
@@ -265,8 +314,8 @@ ${message || "Aucun message supplémentaire."}
                   <i className="bi bi-info-circle"></i>
 
                   <span>
-                    Une seule formation / un seul logiciel est suivi
-                    pendant la période de formation.
+                    Une seule formation et un seul logiciel sont
+                    suivis pendant la période de formation.
                   </span>
 
                 </div>
@@ -277,7 +326,9 @@ ${message || "Aucun message supplémentaire."}
                   className="inscription-submit"
                 >
 
-                  Envoyer ma demande
+                  <span>
+                    Envoyer ma demande
+                  </span>
 
                   <i className="bi bi-whatsapp"></i>
 
@@ -288,11 +339,17 @@ ${message || "Aucun message supplémentaire."}
             </div>
 
 
+            {/* =========================
+                CÔTÉ DROIT
+            ========================== */}
+
             <div className="col-lg-4">
 
               <aside className="inscription-side">
 
-                <span>
+                <div className="side-top-line"></div>
+
+                <span className="side-label">
                   VOTRE DEMANDE
                 </span>
 
@@ -301,16 +358,17 @@ ${message || "Aucun message supplémentaire."}
                 </h2>
 
                 <p>
-                  Votre demande sera préparée puis
-                  transmise directement à l'équipe via WhatsApp.
+                  Votre demande sera préparée automatiquement
+                  puis transmise à l'équipe CNL via WhatsApp.
                 </p>
 
                 <div className="side-line"></div>
 
+
                 <div className="side-info">
 
                   <div>
-                    <small>VILLE</small>
+                    <small>LOCALISATION</small>
                     <strong>République du Congo</strong>
                   </div>
 
@@ -319,7 +377,13 @@ ${message || "Aucun message supplémentaire."}
                     <strong>WhatsApp CNL</strong>
                   </div>
 
+                  <div>
+                    <small>STATUT</small>
+                    <strong>Demande manuelle</strong>
+                  </div>
+
                 </div>
+
 
                 <a
                   href={`https://wa.me/${whatsappNumber}`}
@@ -327,9 +391,24 @@ ${message || "Aucun message supplémentaire."}
                   rel="noreferrer"
                   className="side-whatsapp"
                 >
+
                   <i className="bi bi-whatsapp"></i>
+
                   Ouvrir WhatsApp
+
                 </a>
+
+
+                <div className="side-note">
+
+                  <i className="bi bi-shield-check"></i>
+
+                  <span>
+                    Après vérification et validation par le centre,
+                    le membre pourra accéder aux supports de cours.
+                  </span>
+
+                </div>
 
               </aside>
 
