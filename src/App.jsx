@@ -7,7 +7,7 @@ import Leadership from "./components/Leadership/Leadership";
 import Formation from "./components/formations/formations";
 
 import FormationDetails from "./pages/FormationDetails/FormationDetails";
-
+import RegistrationCTA from "./components/RegistrationCTA/RegistrationCTA";
 function App() {
   return (
     <BrowserRouter>
@@ -26,7 +26,7 @@ function App() {
 
       <Leadership />
 
-      
+      <RegistrationCTA />
         <Formation />
 
         

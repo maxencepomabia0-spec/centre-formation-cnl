@@ -7,6 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import './index.css'
 import './styles/navbar.css'
+import './styles/RegistrationCTA.css'
 import App from './App.jsx'
 import './styles/Hero.css'
 import './styles/Leadership.css'

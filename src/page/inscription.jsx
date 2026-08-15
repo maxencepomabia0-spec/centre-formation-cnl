@@ -7,9 +7,8 @@ function Inscription() {
 
   const formationSlug = searchParams.get("formation");
 
-  const formation = formations.find(
-    (item) => item.slug === formationSlug
-  );
+  const formation =
+    formations.find((item) => item.slug === formationSlug) ?? formations[0];
 
   const whatsappNumber = "242064490583";
 
@@ -28,11 +27,6 @@ function Inscription() {
     const logiciel = formData.get("logiciel")?.toString().trim();
     const message = formData.get("message")?.toString().trim();
 
-    if (!formation) {
-      alert("La formation sélectionnée est introuvable.");
-      return;
-    }
-
     const texte = `
 Bonjour CNL,
 
@@ -45,7 +39,7 @@ E-mail : ${email}
 Ville : ${ville}
 Profil : ${profil}
 
-Formation : ${formation.title}
+Formation : ${formation?.title || "Non spécifiée"}
 Logiciel souhaité : ${logiciel}
 
 Message :
