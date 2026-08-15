@@ -12,6 +12,7 @@ import './styles/Hero.css'
 import './styles/Leadership.css'
 import './styles/formations.css'
 import './pages/FormationDetails/FormationDetails.css'
+import './styles/site-lower.css'
 
 
 createRoot(document.getElementById('root')).render(

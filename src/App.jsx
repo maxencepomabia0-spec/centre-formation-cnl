@@ -19,15 +19,20 @@ function App() {
 
         {/* PAGE D'ACCUEIL */}
         <Route
-          path="/"
-          element={
-            <>
-              <Hero />
-              <Leadership />
-              <Formation />
-            </>
-          }
-        />
+  path="/"
+  element={
+    <>
+      <Hero />
+
+      <Leadership />
+
+      
+        <Formation />
+
+        
+    </>
+  }
+/>
 
         {/* PAGE D'UNE FORMATION */}
         <Route

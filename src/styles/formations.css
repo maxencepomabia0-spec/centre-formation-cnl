@@ -8,9 +8,62 @@
 
   padding: 120px 0;
 
-  background: #eef0ef;
-
   color: #101318;
+
+  background:
+    linear-gradient(
+      rgba(238, 240, 239, 0.86),
+      rgba(238, 240, 239, 0.90)
+    ),
+    url("/formation-bg.jpg");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.formations-section::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -40px;
+
+  background:
+    url("/formation-bg.jpg");
+
+  background-size: cover;
+  background-position: center;
+
+  opacity: 0.08;
+
+  filter:
+    grayscale(1)
+    contrast(0.85)
+    brightness(1.1);
+
+  transform: scale(1.08);
+
+  animation: formationImageDrift 28s ease-in-out infinite;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+.formations-section > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes formationImageDrift {
+
+  0%,
+  100% {
+    transform: scale(1.08) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: scale(1.11) translate3d(-10px, 6px, 0);
+  }
+
 }
 
 

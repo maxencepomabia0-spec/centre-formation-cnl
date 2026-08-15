@@ -1,0 +1,106 @@
+/* =========================================================
+   SECTIONS INFÉRIEURES — FILIGRANE BTP
+========================================================= */
+
+.site-lower-sections {
+  position: relative;
+  overflow: hidden;
+  background: #eef0ef;
+}
+
+
+/* =========================================================
+   IMAGE DE FOND
+========================================================= */
+
+.site-lower-sections::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 0;
+
+  background-image: url("/formation-bg.jpg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+
+  opacity: 0.10;
+
+  filter:
+    grayscale(1)
+    contrast(0.8)
+    brightness(1.1);
+
+  transform: scale(1.05);
+
+  animation: formationBackgroundDrift 24s ease-in-out infinite;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   VOILE
+========================================================= */
+
+.site-lower-sections::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(238, 240, 239, 0.82),
+      rgba(238, 240, 239, 0.76) 40%,
+      rgba(238, 240, 239, 0.86)
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   LE CONTENU PASSE AU-DESSUS
+========================================================= */
+
+.site-lower-sections > * {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================================================
+   MOUVEMENT LENT
+========================================================= */
+
+@keyframes formationBackgroundDrift {
+
+  0%,
+  100% {
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: scale(1.09) translate3d(-10px, 7px, 0);
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+  .site-lower-sections::before {
+    opacity: 0.07;
+  }
+
+}

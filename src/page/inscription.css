@@ -2,10 +2,13 @@
    INSCRIPTION — CNL
 ========================================================= */
 
-.inscription-page {
+
+  .inscription-page {
   min-height: 100vh;
-  background: #eef0ef;
-  color: #111318;
+
+  background: #0d1015;
+
+  color: #ffffff;
 }
 
 
@@ -139,6 +142,18 @@
 
 .inscription-content {
   padding: 95px 0 120px;
+
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(242, 163, 28, 0.045),
+      transparent 30%
+    ),
+    #0d1015;
+
+  position: relative;
+
+  overflow: hidden;
 }
 
 
@@ -151,15 +166,23 @@
 
   padding: 34px;
 
-  border: 1px solid rgba(16, 19, 24, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   border-radius: 22px;
 
-  background: #ffffff;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.018)
+    );
 
   box-shadow:
-    0 20px 60px rgba(16, 19, 24, 0.06);
+    0 30px 80px rgba(0, 0, 0, 0.28);
+
+  backdrop-filter: blur(18px);
 }
+
 
 .form-section-title {
   margin: 8px 0 25px;
@@ -177,7 +200,9 @@
   letter-spacing: 0.12em;
 }
 
-
+.inscription-form label {
+  color: rgba(255, 255, 255, 0.78);
+}
 /* =========================================================
    LABELS
 ========================================================= */
@@ -208,45 +233,48 @@
 
   padding: 14px 15px;
 
-  border: 1px solid rgba(16, 19, 24, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   border-radius: 10px;
 
   outline: none;
 
-  background: #f7f8f7;
+  background: rgba(255, 255, 255, 0.045);
 
-  color: #111318;
+  color: #ffffff;
 
   font-size: 0.82rem;
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.inscription-form input:hover,
-.inscription-form select:hover,
-.inscription-form textarea:hover {
-  background: #ffffff;
-}
+.inscription-form input::placeholder,
+.inscription-form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+} 
 
 .inscription-form input:focus,
 .inscription-form select:focus,
 .inscription-form textarea:focus {
   border-color: #f2a31c;
 
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.07);
+
+  color: #ffffff;
 
   box-shadow:
-    0 0 0 3px rgba(242, 163, 28, 0.1);
+    0 0 0 3px rgba(242, 163, 28, 0.09);
 }
-
 .inscription-form textarea {
   resize: vertical;
 }
-
+.inscription-form select option {
+  background: #111318;
+  color: #ffffff;
+}
 
 /* =========================================================
    WARNING
@@ -263,11 +291,13 @@
 
   padding: 15px;
 
+  border: 1px solid rgba(242, 163, 28, 0.14);
+
   border-radius: 12px;
 
-  background: rgba(242, 163, 28, 0.08);
+  background: rgba(242, 163, 28, 0.055);
 
-  color: #6d5a2e;
+  color: rgba(255, 255, 255, 0.58);
 
   font-size: 0.69rem;
 
