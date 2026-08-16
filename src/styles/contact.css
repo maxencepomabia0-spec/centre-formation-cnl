@@ -1,0 +1,147 @@
+.contact-section {
+  padding: 110px 0;
+  background: #0d1015;
+  color: #fff;
+}
+
+.contact-label {
+  color: #f2a31c;
+}
+
+.contact-section h2 {
+  max-width: 650px;
+  margin: 15px 0 20px;
+  font-size: clamp(3rem, 5vw, 5rem);
+  line-height: .92;
+  font-weight: 850;
+  letter-spacing: -.06em;
+}
+
+.contact-section h2 span {
+  color: #f2a31c;
+}
+
+.contact-description {
+  max-width: 540px;
+  color: rgba(255,255,255,.46);
+  font-size: .85rem;
+  line-height: 1.8;
+}
+
+.contact-list {
+  margin-top: 35px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 78px;
+  padding: 14px 5px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  color: #fff;
+  text-decoration: none;
+}
+
+.contact-item:hover {
+  color: #fff;
+}
+
+.contact-icon {
+  width: 43px;
+  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: rgba(242,163,28,.10);
+  color: #f2a31c;
+}
+
+.contact-item div:nth-child(2) {
+  flex: 1;
+}
+
+.contact-item small,
+.contact-item strong {
+  display: block;
+}
+
+.contact-item small {
+  color: rgba(255,255,255,.30);
+  font-size: .58rem;
+  letter-spacing: .10em;
+}
+
+.contact-item strong {
+  margin-top: 4px;
+  font-size: .78rem;
+}
+
+.contact-arrow {
+  color: rgba(255,255,255,.35);
+}
+
+.contact-panel {
+  position: relative;
+  padding: 42px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(242,163,28,.12),
+      transparent 40%
+    ),
+    rgba(255,255,255,.035);
+}
+
+.contact-panel > span {
+  color: #f2a31c;
+  font-family: monospace;
+  font-size: .62rem;
+}
+
+.contact-panel h3 {
+  margin: 18px 0;
+  font-size: 2.5rem;
+  line-height: .98;
+  letter-spacing: -.05em;
+}
+
+.contact-panel p {
+  color: rgba(255,255,255,.42);
+  font-size: .78rem;
+  line-height: 1.7;
+}
+
+.contact-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+  min-height: 52px;
+  border-radius: 11px;
+  background: #f2a31c;
+  color: #111318;
+  font-size: .72rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.contact-button i:last-child {
+  margin-left: auto;
+  margin-right: 14px;
+}
+
+@media (max-width: 767px) {
+  .contact-section {
+    padding: 80px 0;
+  }
+
+  .contact-panel {
+    padding: 28px;
+  }
+}

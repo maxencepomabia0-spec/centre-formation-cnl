@@ -1,0 +1,124 @@
+.testimonials-section {
+  padding: 110px 0;
+  background: #eef0ef;
+  color: #111318;
+}
+
+.testimonials-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 45px;
+}
+
+.testimonials-heading h2 {
+  max-width: 650px;
+  margin: 14px 0 0;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: .94;
+  font-weight: 850;
+  letter-spacing: -.06em;
+}
+
+.testimonials-heading h2 > span {
+  color: #b87908;
+}
+
+.testimonials-heading > p {
+  max-width: 360px;
+  margin: 0;
+  color: #70757b;
+  font-size: .78rem;
+  line-height: 1.7;
+}
+
+.testimonial-card {
+  height: 100%;
+  padding: 27px;
+  border: 1px solid rgba(16,19,24,.08);
+  border-radius: 22px;
+  background: #111318;
+  color: #fff;
+  box-shadow: 0 20px 55px rgba(16,19,24,.10);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 28px 65px rgba(16,19,24,.16);
+}
+
+.testimonial-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.testimonial-top > i {
+  color: #f2a31c;
+  font-size: 1.8rem;
+}
+
+.testimonial-stars {
+  color: #f2a31c;
+  font-size: .72rem;
+  letter-spacing: .08em;
+}
+
+.testimonial-quote {
+  min-height: 120px;
+  margin: 28px 0;
+  color: rgba(255,255,255,.70);
+  font-size: .82rem;
+  line-height: 1.75;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f2a31c;
+  color: #111318;
+  font-weight: 800;
+}
+
+.testimonial-author strong,
+.testimonial-author span {
+  display: block;
+}
+
+.testimonial-author strong {
+  font-size: .76rem;
+}
+
+.testimonial-author span {
+  margin-top: 3px;
+  color: rgba(255,255,255,.36);
+  font-size: .62rem;
+}
+
+@media (max-width: 767px) {
+  .testimonials-section {
+    padding: 80px 0;
+  }
+
+  .testimonials-heading {
+    display: block;
+  }
+
+  .testimonials-heading > p {
+    margin-top: 20px;
+  }
+}

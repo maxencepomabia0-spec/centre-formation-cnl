@@ -8,6 +8,9 @@ import Formation from "./components/formations/formations";
 
 import FormationDetails from "./pages/FormationDetails/FormationDetails";
 import RegistrationCTA from "./components/RegistrationCTA/RegistrationCTA";
+import Testimonials from "./components/Testimonials/Testimonials";
+import Contact from "./components/Contact/Contact";
+import Footer from "./components/Footer/Footer";
 function App() {
   return (
     <BrowserRouter>
@@ -27,8 +30,11 @@ function App() {
       <Leadership />
 
       <RegistrationCTA />
-        <Formation />
 
+        <Formation />
+        <Testimonials />
+                <Contact />
+         <Footer />
         
     </>
   }

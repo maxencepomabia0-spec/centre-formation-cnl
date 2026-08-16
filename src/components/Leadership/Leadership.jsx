@@ -28,7 +28,7 @@ function Leadership() {
               Le Centre National de Leadership accompagne les
               apprenants dans le développement de compétences
               techniques et professionnelles adaptées aux
-              exigences du monde du travail.
+              exigences du monde du travail.solution adaptée aux besoins du marché et aux défis de demain.
             </p>
 
             <div className="leadership-points">

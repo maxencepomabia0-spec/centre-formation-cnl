@@ -14,6 +14,9 @@ import './styles/Leadership.css'
 import './styles/formations.css'
 import './pages/FormationDetails/FormationDetails.css'
 import './styles/site-lower.css'
+import './styles/Testimonials.css'
+import './styles/contact.css'
+import './styles/footer.css'
 
 
 createRoot(document.getElementById('root')).render(
