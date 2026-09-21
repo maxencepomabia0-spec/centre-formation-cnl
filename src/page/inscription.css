@@ -276,6 +276,44 @@
   color: #ffffff;
 }
 
+.tarif-preview {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+
+  margin-top: 14px;
+  padding: 16px 18px;
+
+  border: 1px solid rgba(242, 163, 28, 0.2);
+  border-radius: 12px;
+
+  background: rgba(242, 163, 28, 0.06);
+}
+/* =========================================================
+   APERÇU DU TARIF
+========================================================= */
+.tarif-preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tarif-preview-item small {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+}
+
+.tarif-preview-item strong {
+  color: #f2a31c;
+  font-size: 0.8rem;
+}
+
+.tarif-preview-separator {
+  width: 1px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.12);
+}
 /* =========================================================
    WARNING
 ========================================================= */
@@ -579,4 +617,12 @@
   .inscription-submit {
     padding: 14px 16px;
   }
+  .tarif-preview {
+  gap: 14px;
+  padding: 14px;
+}
+
+.tarif-preview-item strong {
+  font-size: 0.72rem;
+}
 }

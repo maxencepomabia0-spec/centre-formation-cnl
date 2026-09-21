@@ -1,0 +1,246 @@
+/* =========================================================
+   À PROPOS DU CNL
+========================================================= */
+
+.about-section {
+  position: relative;
+  padding: 110px 0 90px;
+  background: linear-gradient(180deg, #0d1117 0%, #101318 100%);
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.about-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(245, 166, 35, 0.08), transparent 35%);
+  pointer-events: none;
+}
+
+.about-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.about-visual-wrap {
+  margin-bottom: 54px;
+}
+
+.about-visual-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: #f5a623;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.about-visual-label span {
+  width: 28px;
+  height: 2px;
+  background: #f5a623;
+}
+
+.about-slider {
+  position: relative;
+  width: 100%;
+  height: 560px;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #111821;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.about-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.about-slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.about-slider-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.about-slider-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.about-slider-dots .dot.active {
+  background: #f5a623;
+  border-color: #f5a623;
+  transform: scale(1.15);
+}
+
+.about-content {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.about-label {
+  margin-bottom: 18px;
+}
+
+.about-title {
+  margin: 0 0 28px;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 0.96;
+  font-weight: 850;
+  letter-spacing: -0.06em;
+  color: #ffffff;
+}
+
+.about-body {
+  display: grid;
+  gap: 22px;
+}
+
+.about-body p,
+.about-block p,
+.about-list li {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  line-height: 1.9;
+  margin: 0;
+}
+
+.about-block {
+  margin-top: 42px;
+}
+
+.about-block h3 {
+  margin: 0 0 18px;
+  color: #f5a623;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+
+.about-list {
+  margin: 18px 0 20px;
+  padding-left: 22px;
+  display: grid;
+  gap: 10px;
+}
+
+.about-list li::marker {
+  color: #f5a623;
+}
+
+.software-block {
+  margin-top: 48px;
+}
+
+.software-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.software-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 166, 35, 0.28);
+  background: rgba(255, 255, 255, 0.02);
+  color: #f3f4f6;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.software-tag:hover {
+  transform: translateY(-1px);
+  border-color: rgba(245, 166, 35, 0.55);
+}
+
+.about-signature {
+  margin-top: 52px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f5a623;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 991.98px) {
+  .about-section {
+    padding-top: 90px;
+  }
+
+  .about-slider {
+    height: 460px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .about-section {
+    padding: 80px 0 70px;
+  }
+
+  .about-slider {
+    height: 360px;
+    border-radius: 22px;
+  }
+
+  .about-title {
+    margin-bottom: 22px;
+  }
+
+  .about-body p,
+  .about-block p,
+  .about-list li {
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .about-visual-wrap {
+    margin-bottom: 36px;
+  }
+
+  .about-slider {
+    height: 290px;
+    border-radius: 18px;
+  }
+
+  .software-grid {
+    gap: 10px;
+  }
+
+  .software-tag {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

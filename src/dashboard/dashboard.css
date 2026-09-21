@@ -1,0 +1,319 @@
+.dashboard-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding: 40px 7%;
+  color: #172033;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.dashboard-header {
+  margin-bottom: 30px;
+}
+
+.dashboard-welcome {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.dashboard-header h1 {
+  font-size: 36px;
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.dashboard-header p:last-child {
+  margin: 0;
+  color: #687386;
+  font-size: 16px;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.dashboard-profile {
+  margin-bottom: 45px;
+}
+
+.profile-card {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.profile-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #172033;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.profile-card h3 {
+  margin: 0 0 5px;
+  font-size: 18px;
+}
+
+.profile-card p {
+  margin: 0;
+  color: #7b8494;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+
+.section-title {
+  margin-bottom: 25px;
+}
+
+.section-title p {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #7b8494;
+  margin-bottom: 5px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+/* =========================
+   FORMATIONS GRID
+========================= */
+
+.formations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* =========================
+   FORMATION CARD
+========================= */
+
+.formation-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.formation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.formation-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.formation-badge {
+  background: #eef2ff;
+  color: #4056d6;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.payment-status {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.payment-status.en_attente {
+  color: #c57b00;
+}
+
+.payment-status.paye {
+  color: #17864b;
+}
+
+.formation-card h3 {
+  font-size: 21px;
+  margin: 0 0 8px;
+}
+
+.software-name {
+  color: #7b8494;
+  margin-bottom: 25px;
+}
+
+/* =========================
+   FORMATION INFO
+========================= */
+
+.formation-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 18px 0;
+  border-top: 1px solid #edf0f5;
+  border-bottom: 1px solid #edf0f5;
+  margin-bottom: 20px;
+}
+
+.formation-info div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.formation-info span {
+  font-size: 12px;
+  color: #8b94a4;
+}
+
+.formation-info strong {
+  font-size: 14px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-payment,
+.btn-access {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-payment {
+  background: #172033;
+  color: white;
+}
+
+.btn-payment:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn-access {
+  background: #17864b;
+  color: white;
+}
+
+.btn-access:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty-dashboard {
+  background: white;
+  border-radius: 18px;
+  padding: 45px;
+  text-align: center;
+}
+
+.empty-dashboard h3 {
+  margin-bottom: 8px;
+}
+
+.empty-dashboard p {
+  color: #7b8494;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.dashboard-loading {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.spinner {
+  width: 35px;
+  height: 35px;
+  border: 4px solid #ddd;
+  border-top: 4px solid #172033;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.dashboard-error {
+  max-width: 500px;
+  margin: 100px auto;
+  background: white;
+  padding: 35px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.dashboard-error h2 {
+  margin-bottom: 10px;
+}
+
+.dashboard-error p {
+  color: #7b8494;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 30px 20px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 28px;
+  }
+
+  .formation-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .formations-grid {
+    grid-template-columns: 1fr;
+  }
+}
