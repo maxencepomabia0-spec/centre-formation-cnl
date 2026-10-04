@@ -1,6 +1,7 @@
-import { useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useState } from "react";
 import formations from "../data/formations";
+import { supabase } from "../config/supabase";
 import "./inscription.css";
 
 /*
@@ -28,20 +29,6 @@ const logicielsTaries = [
   "Robot Structural",
   "SketchUp",
 ];
-
-
-/*
-|--------------------------------------------------------------------------
-| TABLE DE CORRESPONDANCE : noms formations.js → clés tarifsLogiciels
-|--------------------------------------------------------------------------
-*/
-
-const correspondanceLogiciels = {
-  "Robot Structural Analysis": "Robot Structural",
-  "Revit Architecture": "Revit",
-  "Autodesk Revit": "Revit",
-  "Microsoft Project": "MS Project",
-};
 
 
 /*
@@ -107,6 +94,7 @@ const tarifsLogiciels = {
   },
 };
 
+const whatsappNumber = "242064490583";
 
 /*
 |--------------------------------------------------------------------------
@@ -122,7 +110,10 @@ function Inscription() {
   */
 
   const [searchParams] = useSearchParams();
-
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const formationSlug = searchParams.get("formation");
 
   const formationOrigine = formations.find(
@@ -173,32 +164,15 @@ function Inscription() {
 
   /*
   |--------------------------------------------------------------------------
-  | WHATSAPP
-  |--------------------------------------------------------------------------
-  */
-
-  const whatsappNumber = "242064490583";
-
-
-  /*
-  |--------------------------------------------------------------------------
   | ENVOI DU FORMULAIRE
   |--------------------------------------------------------------------------
   */
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-
-    const formData = new FormData(form);
-
-    /*
-    |--------------------------------------------------------------------------
-    | RÉCUPÉRATION DES DONNÉES
-    |--------------------------------------------------------------------------
-    */
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+ 
+    const formData = new FormData(e.currentTarget);
     const nom = formData.get("nom")?.toString().trim();
     const prenom = formData.get("prenom")?.toString().trim();
     const telephone = formData.get("telephone")?.toString().trim();
@@ -208,206 +182,165 @@ function Inscription() {
     const filiere = formData.get("filiere")?.toString().trim();
     const logiciel = formData.get("logiciel")?.toString().trim();
     const message = formData.get("message")?.toString().trim();
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | VÉRIFICATIONS
-    |--------------------------------------------------------------------------
-    */
-
-    if (!nom || !prenom || !telephone || !email || !ville || !profil) {
-      alert("Veuillez remplir tous les champs obligatoires.");
-      return;
-    }
-
-    if (!filiere) {
-      alert("Veuillez choisir une filière.");
-      return;
-    }
-
-    if (!logiciel) {
-      alert("Veuillez choisir un logiciel.");
-      return;
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RÉCUPÉRATION DU TARIF
-    |--------------------------------------------------------------------------
-    */
-
     const tarif = tarifsLogiciels[logiciel];
 
-    if (!tarif) {
-      alert(
-        "Aucun tarif n'est disponible pour ce logiciel."
-      );
+    if (!nom || !prenom || !telephone || !email || !ville || !profil) {
+      setError("Veuillez remplir tous les champs obligatoires.");
       return;
     }
 
+    if (!password || password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères.");
+      return;
+    }
 
-    try {
+    if (!tarif) {
+      setError("Impossible de déterminer le tarif de cette inscription.");
+      return;
+    }
 
-      /*
-      |--------------------------------------------------------------------------
-      | ENVOI AU BACKEND
-      |--------------------------------------------------------------------------
-      */
-const accessToken = localStorage.getItem("access_token");
+    setLoading(true);
 
-if (!accessToken) {
-  alert("Vous devez être connecté pour vous inscrire.");
-  return;
-}
-      const response = await fetch(
-        "http://localhost:5001/api/inscriptions",
+  try {
+    // ==========================================
+    // 1. VÉRIFIER S'IL EXISTE DÉJÀ UNE SESSION
+    // ==========================================
+
+    let {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    // ==========================================
+    // 2. SI PAS DE SESSION → CRÉER LE COMPTE
+    // ==========================================
+
+    if (!session) {
+      const registerResponse = await fetch(
+        "http://localhost:5001/api/auth/register",
         {
           method: "POST",
-
           headers: {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${accessToken}`,
-},
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
+            email,
+            password,
             nom,
             prenom,
-            telephone,
-            email,
-            ville,
-            profil,
-            filiere,
-            logiciel,
-
-            /*
-            | L'offre vient du catalogue local.
-            | Le backend vérifiera à nouveau le tarif dans Supabase.
-            */
-
-            offre: tarif.offre,
-
-            message,
-
-            /*
-            |--------------------------------------------------------------------------
-            | FORMATION D'ORIGINE
-            |--------------------------------------------------------------------------
-            */
-
-            formation_slug:
-              formation?.slug || null,
-
-            formation_nom:
-              formation?.title || null,
           }),
         }
       );
 
+      const registerResult = await registerResponse.json();
 
-      /*
-      |--------------------------------------------------------------------------
-      | RÉPONSE DU BACKEND
-      |--------------------------------------------------------------------------
-      */
-
-      const result = await response.json();
-
-
-      /*
-      |--------------------------------------------------------------------------
-      | ERREUR
-      |--------------------------------------------------------------------------
-      */
-
-      if (!response.ok || !result.success) {
-
-        console.error(
-          "Erreur inscription :",
-          result
+      if (!registerResponse.ok) {
+        throw new Error(
+          registerResult.message || "Impossible de créer votre compte."
         );
-
-        alert(
-          result.message ||
-          "Impossible d'enregistrer votre inscription."
-        );
-
-        return;
       }
 
+      // ==========================================
+      // 3. CONNEXION AUTOMATIQUE
+      // ==========================================
 
-      /*
-      |--------------------------------------------------------------------------
-      | INSCRIPTION CRÉÉE
-      |--------------------------------------------------------------------------
-      */
+      const { data: loginData, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      const inscription = result.inscription;
+      if (loginError) {
+        throw new Error(
+          "Votre compte a été créé, mais la connexion automatique a échoué. Connectez-vous depuis la page de connexion."
+        );
+      }
 
+      session = loginData.session;
+    }
 
-      /*
-      |--------------------------------------------------------------------------
-      | MESSAGE WHATSAPP
-      |--------------------------------------------------------------------------
-      */
+    // ==========================================
+    // 4. VÉRIFIER LA SESSION
+    // ==========================================
 
-      const texte = `
-Bonjour CNL,
+    const accessToken = session?.access_token;
 
-Je souhaite m'inscrire à une formation.
-
-Nom : ${nom}
-Prénom : ${prenom}
-Téléphone : ${telephone}
-E-mail : ${email}
-Ville : ${ville}
-Profil : ${profil}
-
-Filière souhaitée : ${filiere}
-Logiciel souhaité : ${logiciel}
-Formule : ${inscription.offre}
-Montant : ${inscription.montant} FCFA
-
-Formation d'origine :
-${formationOrigine?.title || "Inscription générale"}
-
-Message :
-${message || "Aucun message supplémentaire."}
-      `.trim();
-
-
-      /*
-      |--------------------------------------------------------------------------
-      | URL WHATSAPP
-      |--------------------------------------------------------------------------
-      */
-
-      const whatsappUrl =
-        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-          texte
-        )}`;
-
-
-      /*
-      |--------------------------------------------------------------------------
-      | OUVERTURE WHATSAPP
-      |--------------------------------------------------------------------------
-      */
-
-      window.location.href = whatsappUrl;
-
-    } catch (error) {
-
-      console.error(
-        "Erreur connexion backend :",
-        error
-      );
-
-      alert(
-        "Impossible de contacter le serveur. Vérifiez que le backend est bien démarré."
+    if (!accessToken) {
+      throw new Error(
+        "Impossible de récupérer votre session. Veuillez vous reconnecter."
       );
     }
-  };
+    localStorage.setItem("access_token", accessToken);
+    navigate("/dashboard");
+
+    // ==========================================
+    // 5. ENREGISTRER L'INSCRIPTION
+    // ==========================================
+
+    const inscriptionResponse = await fetch(
+      "http://localhost:5001/api/inscriptions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          nom,
+          prenom,
+          telephone,
+          email,
+          ville,
+          profil,
+          filiere,
+          logiciel,
+          offre: tarif.offre,
+          message,
+          formation_slug: formation?.slug || null,
+          formation_nom: formation?.title || null,
+        }),
+      }
+    );
+
+    const inscriptionResult = await inscriptionResponse.json();
+
+    if (!inscriptionResponse.ok) {
+      throw new Error(
+        inscriptionResult.message ||
+          "Impossible d'enregistrer votre inscription."
+      );
+    }
+
+    // ==========================================
+    // 6. RÉCUPÉRER LE VRAI MONTANT DU BACKEND
+    // ==========================================
+
+    const inscription = inscriptionResult.inscription;
+
+    const montantFinal =
+      inscription?.montant ?? tarif.montant;
+
+localStorage.setItem("access_token", accessToken);
+
+navigate("/dashboard");
+    // ==========================================
+    // 9. ALLER AU DASHBOARD
+    // ==========================================
+
+     navigate("/dashboard");
+
+  } catch (error) {
+    console.error("Erreur inscription :", error);
+
+    setError(
+      error.message || "Une erreur est survenue pendant l'inscription."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
 
   /*
@@ -575,7 +508,24 @@ ${message || "Aucun message supplémentaire."}
                     />
 
                   </div>
+                  <div className="form-group">
+  <label htmlFor="password">Mot de passe *</label>
 
+  <input
+    id="password"
+    name="password"
+    type="password"
+    placeholder="Choisissez un mot de passe"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    minLength={6}
+    required
+  />
+
+  <small>
+    Ce mot de passe vous permettra d'accéder à votre espace étudiant.
+  </small>
+</div>
 
                   {/* VILLE */}
 
@@ -821,17 +771,22 @@ ${message || "Aucun message supplémentaire."}
                 ================================================== */}
 
                 <button
-                  type="submit"
-                  className="inscription-submit"
-                >
+             type="submit"
+         className="inscription-submit"
+         disabled={loading}
+>
+       <span>
+    {loading ? "Création de votre espace..." : "Créer mon espace étudiant"}
+       </span>
 
-                  <span>
-                    Envoyer ma demande
-                  </span>
+      <i className="bi bi-arrow-right"></i>
+     </button>
 
-                  <i className="bi bi-whatsapp"></i>
-
-                </button>
+                {error && (
+                  <p className="inscription-error" role="alert">
+                    {error}
+                  </p>
+                )}
 
               </form>
 

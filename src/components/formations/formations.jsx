@@ -39,10 +39,10 @@ function Formations() {
 
 
           <p>
-            Des formations professionnelles conçues pour
+            Des formations qualifies certifie  professionnelles conçues pour
             développer des compétences directement applicables
             dans le secteur du génie civil, de l'architecture
-            et de la gestion de projets.
+            et de la gestion de projets. tout en respectons les regles du btp et du genie civil
           </p>
 
         </div>
