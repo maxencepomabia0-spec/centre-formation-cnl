@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import formations from "../data/formations";
 import { supabase } from "../config/supabase";
 import "./inscription.css";
@@ -103,18 +103,57 @@ const whatsappNumber = "242064490583";
 */
 
 function Inscription() {
-  /*
+  /* 
   |--------------------------------------------------------------------------
   | FORMATION D'ORIGINE
   |--------------------------------------------------------------------------
-  */
+  */const [sessionUser, setSessionUser] = useState(null);
+const [authLoading, setAuthLoading] = useState(true)
+const [switchingAccount, setSwitchingAccount] = useState(false);
+const [error, setError] = useState("");
+useEffect(() => {
+  const loadSession = async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setSessionUser(session?.user ?? null);
+    } catch (error) {
+      console.error("Erreur de vérification de session :", error);
+      setError("Impossible de vérifier votre session. Rechargez la page.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  loadSession();
+}, []);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const formationSlug = searchParams.get("formation");
+
+  const handleSwitchAccount = async () => {
+    setSwitchingAccount(true);
+    setError("");
+
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+
+    if (error) {
+      console.error("Erreur de déconnexion :", error);
+      setError("Impossible de changer de compte. Réessayez.");
+      setSwitchingAccount(false);
+      return;
+    }
+
+    localStorage.removeItem("access_token");
+    setSessionUser(null);
+    setPassword("");
+    setSwitchingAccount(false);
+  };
 
   const formationOrigine = formations.find(
     (item) => item.slug === formationSlug
@@ -171,6 +210,11 @@ function Inscription() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (authLoading) {
+      setError("Veuillez patienter pendant la vérification de votre session.");
+      return;
+    }
  
     const formData = new FormData(e.currentTarget);
     const nom = formData.get("nom")?.toString().trim();
@@ -184,12 +228,12 @@ function Inscription() {
     const message = formData.get("message")?.toString().trim();
     const tarif = tarifsLogiciels[logiciel];
 
-    if (!nom || !prenom || !telephone || !email || !ville || !profil) {
+    if (!nom || !prenom || !telephone || !email || !ville || !profil || !filiere || !logiciel || !tarif) {
       setError("Veuillez remplir tous les champs obligatoires.");
       return;
     }
 
-    if (!password || password.length < 6) {
+    if (!sessionUser && (!password || password.length < 6)) {
       setError("Le mot de passe doit contenir au moins 6 caractères.");
       return;
     }
@@ -216,28 +260,42 @@ function Inscription() {
 
     if (!session) {
       const registerResponse = await fetch(
-        "http://localhost:5001/api/auth/register",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            nom,
-            prenom,
-          }),
-        }
-      );
-
+  "http://localhost:5001/api/auth/register",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password,
+      nom,
+      prenom,
+      telephone,
+      ville,
+      profil,
+    }),
+  }
+);
       const registerResult = await registerResponse.json();
 
       if (!registerResponse.ok) {
-        throw new Error(
-          registerResult.message || "Impossible de créer votre compte."
-        );
-      }
+  const dejaInscrit =
+    registerResponse.status === 409 ||
+    /already been registered|already registered|already exists/i.test(
+      registerResult.message || ""
+    );
+
+  if (dejaInscrit) {
+    throw new Error(
+      "Cet email possède déjà un compte CNL. Connectez-vous avec votre email et votre mot de passe."
+    );
+  }
+
+  throw new Error(
+    registerResult.message || "Impossible de créer votre compte."
+  );
+}
 
       // ==========================================
       // 3. CONNEXION AUTOMATIQUE
@@ -270,7 +328,6 @@ function Inscription() {
       );
     }
     localStorage.setItem("access_token", accessToken);
-    navigate("/dashboard");
 
     // ==========================================
     // 5. ENREGISTRER L'INSCRIPTION
@@ -310,23 +367,27 @@ function Inscription() {
       );
     }
 
-    // ==========================================
-    // 6. RÉCUPÉRER LE VRAI MONTANT DU BACKEND
-    // ==========================================
+  // L'inscription est enregistrée.
+// Fermer la session pour afficher le Login.
+const { error: logoutError } = await supabase.auth.signOut({
+  scope: "local",
+});
 
-    const inscription = inscriptionResult.inscription;
+if (logoutError) {
+  throw new Error(
+    "Inscription enregistrée, mais déconnexion impossible. Utilisez le bouton de déconnexion."
+  );
+}
 
-    const montantFinal =
-      inscription?.montant ?? tarif.montant;
+localStorage.removeItem("access_token");
 
-localStorage.setItem("access_token", accessToken);
-
-navigate("/dashboard");
-    // ==========================================
-    // 9. ALLER AU DASHBOARD
-    // ==========================================
-
-     navigate("/dashboard");
+navigate("/login", {
+  replace: true,
+  state: {
+    message:
+      "Votre compte et votre inscription ont été créés. Connectez-vous avec votre email et votre mot de passe.",
+  },
+});
 
   } catch (error) {
     console.error("Erreur inscription :", error);
@@ -417,9 +478,25 @@ navigate("/dashboard");
             <div className="col-lg-8">
 
               <form
+                key={sessionUser?.id ?? "new-account"}
                 className="inscription-form"
                 onSubmit={handleSubmit}
               >
+
+                {sessionUser && (
+                  <div className="inscription-session-note">
+                    <span>
+                      Compte connecté : <strong>{sessionUser.email}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleSwitchAccount}
+                      disabled={switchingAccount || loading}
+                    >
+                      {switchingAccount ? "Déconnexion..." : "Changer de compte"}
+                    </button>
+                  </div>
+                )}
 
 
                 {/* =================================================
@@ -447,6 +524,8 @@ navigate("/dashboard");
                       type="text"
                       name="nom"
                       placeholder="Votre nom"
+                      defaultValue={sessionUser?.user_metadata?.nom || ""}
+                      readOnly={!!sessionUser?.user_metadata?.nom}
                       required
                     />
 
@@ -466,6 +545,8 @@ navigate("/dashboard");
                       type="text"
                       name="prenom"
                       placeholder="Votre prénom"
+                      defaultValue={sessionUser?.user_metadata?.prenom || ""}
+                      readOnly={!!sessionUser?.user_metadata?.prenom}
                       required
                     />
 
@@ -485,6 +566,7 @@ navigate("/dashboard");
                       type="tel"
                       name="telephone"
                       placeholder="+242 ..."
+                      defaultValue={sessionUser?.user_metadata?.telephone || ""}
                       required
                     />
 
@@ -504,28 +586,31 @@ navigate("/dashboard");
                       type="email"
                       name="email"
                       placeholder="vous@example.com"
-                      required
+                      defaultValue={sessionUser?.email || ""}
+                      readOnly={!!sessionUser?.email}
                     />
 
                   </div>
-                  <div className="form-group">
-  <label htmlFor="password">Mot de passe *</label>
+                  {!sessionUser && (
+  <div className="form-group">
+    <label htmlFor="password">Mot de passe *</label>
 
-  <input
-    id="password"
-    name="password"
-    type="password"
-    placeholder="Choisissez un mot de passe"
-    value={password}
-    onChange={(e) => setPassword(e.target.value)}
-    minLength={6}
-    required
-  />
+    <input
+      id="password"
+      name="password"
+      type="password"
+      placeholder="Choisissez un mot de passe"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      minLength={6}
+      required
+    />
 
-  <small>
-    Ce mot de passe vous permettra d'accéder à votre espace étudiant.
-  </small>
-</div>
+    <small>
+      Ce mot de passe vous permettra d'accéder à votre espace étudiant.
+    </small>
+  </div>
+)}
 
                   {/* VILLE */}
 
@@ -540,6 +625,8 @@ navigate("/dashboard");
                       type="text"
                       name="ville"
                       placeholder="Brazzaville, Pointe-Noire..."
+                      defaultValue={sessionUser?.user_metadata?.ville || ""}
+                  
                       required
                     />
 
@@ -557,6 +644,8 @@ navigate("/dashboard");
                     <select
                       id="profil"
                       name="profil"
+                      defaultValue={sessionUser?.user_metadata?.profil || ""}
+                      
                       required
                     >
 
@@ -773,10 +862,14 @@ navigate("/dashboard");
                 <button
              type="submit"
          className="inscription-submit"
-         disabled={loading}
+            disabled={loading || authLoading}
 >
        <span>
-    {loading ? "Création de votre espace..." : "Créer mon espace étudiant"}
+         {authLoading
+          ? "Vérification de votre session..."
+          : loading
+            ? "Création de votre espace..."
+            : "Créer mon espace étudiant"}
        </span>
 
       <i className="bi bi-arrow-right"></i>
@@ -789,7 +882,14 @@ navigate("/dashboard");
                 )}
 
               </form>
+              
 
+              <p className="login-register-link">
+                Vous avez déjà un compte ?{" "}
+                <Link to="/login">Se connecter</Link>
+              </p>
+
+            
             </div>
 
 

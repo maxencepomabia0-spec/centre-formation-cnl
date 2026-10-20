@@ -16,7 +16,7 @@ import RegistrationCTA from "./components/RegistrationCTA/RegistrationCTA";
 import Testimonials from "./components/Testimonials/Testimonials";
 import Contact from "./components/Contact/Contact";
 import Footer from "./components/Footer/Footer";
-
+import RequireAuth from "./components/RequireAuth";
 function App() {
   return (
     <BrowserRouter>
@@ -72,12 +72,16 @@ function App() {
         {/* DASHBOARD                  */}
         {/* ========================= */}
         <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
+  path="/dashboard"
+  element={
+    <RequireAuth>
+      <Dashboard />
+    </RequireAuth>
+  }
+/>
 
       </Routes>
-
+      
     </BrowserRouter>
   );
 }
