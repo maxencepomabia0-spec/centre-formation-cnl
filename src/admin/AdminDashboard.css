@@ -1,0 +1,310 @@
+
+.cnl-admin {
+  --admin-bg: #f2f4f7;
+  --admin-dark: #111827;
+  --admin-border: #e5e7eb;
+  display: flex;
+  min-height: 100vh;
+  background: var(--admin-bg);
+  color: var(--admin-dark);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.cnl-admin-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  background: #111827;
+  color: white;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cnl-admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 55px;
+}
+
+.cnl-admin-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: #e5e7eb;
+  color: #111827;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.cnl-admin-brand strong {
+  display: block;
+  font-size: 21px;
+}
+
+.cnl-admin-brand small {
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.cnl-admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cnl-admin-nav a {
+  color: #aeb7c7;
+  padding: 14px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.cnl-admin-nav a:hover,
+.cnl-admin-nav a.active {
+  background: #293244;
+  color: #fff;
+}
+
+.cnl-admin-sidebar-footer {
+  margin-top: auto;
+  color: #7f8a9d;
+  font-size: 11px;
+  padding: 20px 10px;
+}
+
+.cnl-admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: 38px;
+}
+
+.cnl-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.cnl-admin-eyebrow {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.cnl-admin-header h1 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  margin: 8px 0;
+}
+
+.cnl-admin-header p,
+.cnl-admin-panel p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.cnl-admin-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #111827;
+  color: white;
+  font-weight: 800;
+}
+
+.cnl-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.cnl-admin-stat {
+  background: #fff;
+  padding: 25px;
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+}
+
+.cnl-admin-stat span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.cnl-admin-stat strong {
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.cnl-admin-panel {
+  background: white;
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+  padding: 26px;
+  margin-bottom: 24px;
+}
+
+.cnl-admin-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.cnl-admin-panel h2 {
+  font-size: 19px;
+  font-weight: 750;
+  margin: 0 0 8px;
+}
+
+.cnl-admin-panel-heading > span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.cnl-admin-table-scroll {
+  overflow-x: auto;
+}
+
+.cnl-admin table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.cnl-admin th {
+  padding: 15px;
+  color: #64748b;
+  font-size: 12px;
+  background: #f8fafc;
+}
+
+.cnl-admin td {
+  padding: 17px 15px;
+  border-bottom: 1px solid #eef0f3;
+  font-size: 13px;
+}
+
+.cnl-admin td strong,
+.cnl-admin td small {
+  display: block;
+}
+
+.cnl-admin td small {
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+.cnl-admin-status {
+  display: inline-block;
+  padding: 7px 11px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #fff4dd;
+  color: #946200;
+}
+
+.cnl-admin-status.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.cnl-admin-status.pending {
+  background: #fff4dd;
+  color: #946200;
+}
+
+.cnl-admin-empty {
+  text-align: center;
+  color: #94a3b8;
+  padding: 35px !important;
+}
+
+.cnl-admin-error {
+  padding: 16px;
+  margin-bottom: 20px;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 12px;
+}
+
+.cnl-admin-loading {
+  padding: 50px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .cnl-admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cnl-admin {
+    flex-direction: column;
+  }
+
+  .cnl-admin-sidebar {
+    width: 100%;
+    min-height: auto;
+    position: static;
+    padding: 18px;
+  }
+
+  .cnl-admin-brand {
+    margin-bottom: 18px;
+  }
+
+  .cnl-admin-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .cnl-admin-nav a {
+    white-space: nowrap;
+  }
+
+  .cnl-admin-sidebar-footer {
+    display: none;
+  }
+
+  .cnl-admin-main {
+    padding: 20px 14px;
+  }
+
+  .cnl-admin-header {
+    align-items: flex-start;
+  }
+
+  .cnl-admin-stats {
+    gap: 10px;
+  }
+
+  .cnl-admin-stat {
+    padding: 17px;
+  }
+
+  .cnl-admin-panel {
+    padding: 18px 12px;
+  }
+
+  .cnl-admin table {
+    min-width: 650px;
+  }
+}

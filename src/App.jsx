@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Pages
@@ -5,6 +6,10 @@ import Inscription from "./page/inscription";
 import FormationDetails from "./pages/FormationDetails/FormationDetails";
 import Login from "./Login/Login";
 import Dashboard from "./dashboard/dashboard";
+
+// Admin
+import AdminDashboard from "./admin/AdminDashboard";
+import RequireAdmin from "./components/RequireAdmin";
 
 // Components
 import Navbar from "./components/navbar/navbar";
@@ -17,21 +22,17 @@ import Testimonials from "./components/Testimonials/Testimonials";
 import Contact from "./components/Contact/Contact";
 import Footer from "./components/Footer/Footer";
 import RequireAuth from "./components/RequireAuth";
+
 function App() {
   return (
     <BrowserRouter>
-
-      <Navbar />
-
       <Routes>
-
-        {/* ========================= */}
-        {/* PAGE D'ACCUEIL            */}
-        {/* ========================= */}
+        {/* PAGE D'ACCUEIL */}
         <Route
           path="/"
           element={
             <>
+              <Navbar />
               <Hero />
               <Leadership />
               <About />
@@ -44,44 +45,60 @@ function App() {
           }
         />
 
-        {/* ========================= */}
-        {/* PAGE D'UNE FORMATION      */}
-        {/* ========================= */}
+        {/* PAGE FORMATION */}
         <Route
           path="/formation/:slug"
-          element={<FormationDetails />}
+          element={
+            <>
+              <Navbar />
+              <FormationDetails />
+            </>
+          }
         />
 
-        {/* ========================= */}
-        {/* PAGE INSCRIPTION           */}
-        {/* ========================= */}
+        {/* INSCRIPTION */}
         <Route
           path="/inscription"
-          element={<Inscription />}
+          element={
+            <>
+              <Navbar />
+              <Inscription />
+            </>
+          }
         />
 
-        {/* ========================= */}
-        {/* PAGE CONNEXION             */}
-        {/* ========================= */}
+        {/* CONNEXION */}
         <Route
           path="/login"
-          element={<Login />}
+          element={
+            <>
+              <Navbar />
+              <Login />
+            </>
+          }
         />
 
-        {/* ========================= */}
-        {/* DASHBOARD                  */}
-        {/* ========================= */}
+        {/* DASHBOARD ETUDIANT */}
         <Route
-  path="/dashboard"
-  element={
-    <RequireAuth>
-      <Dashboard />
-    </RequireAuth>
-  }
-/>
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Navbar />
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
 
+        {/* DASHBOARD ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminDashboard />
+            </RequireAdmin>
+          }
+        />
       </Routes>
-      
     </BrowserRouter>
   );
 }
