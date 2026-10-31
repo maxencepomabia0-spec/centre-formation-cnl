@@ -1,52 +1,180 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../config/supabase";
+import { motion } from "motion/react";
 import {
-  LayoutDashboard, Users, Wallet, BookOpen,
-  Settings, LogOut, Menu, X, Search, RefreshCw,
-  TrendingUp, Clock3, CircleCheck, GraduationCap,
-  ChevronRight, ShieldCheck, Check, Ban, ArrowUpRight
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell,
+} from "recharts";
+import {
+  LayoutDashboard,
+  Users,
+  Wallet,
+  GraduationCap,
+  LogOut,
+  Menu,
+  Search,
+  RefreshCw,
+  Clock3,
+  CircleCheck,
+  TrendingUp,
+  ArrowUpRight,
+  ChevronRight,
+  ShieldCheck,
+  BookOpen,
+  Settings,
+  X,
+  Check,
+  Ban,
+  CalendarDays,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import "./AdminDashboard.css";
 
 const API = "http://localhost:5001";
-
 const money = (n) =>
   `${new Intl.NumberFormat("fr-FR").format(Number(n) || 0)} FCFA`;
-
-const sections = [
+const navigation = [
   { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
   { id: "students", label: "Étudiants", icon: Users },
   { id: "payments", label: "Paiements", icon: Wallet },
 ];
+const labels = { paye: "Payé", refuse: "Refusé", en_attente: "En attente" };
+const status = (value) => labels[value] || "En attente";
+const dateLabel = (value) =>
+  value
+    ? new Intl.DateTimeFormat("fr-FR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }).format(new Date(value))
+    : "—";
 
-const statusLabel = (status) => {
-  if (status === "paye") return "Payé";
-  if (status === "refuse") return "Refusé";
-  return "En attente";
-};
-
-function StatCard({ label, value, icon: Icon, tone, hint }) {
+function StatusBadge({ value }) {
+  const variant =
+    value === "paye" ? "paid" : value === "refuse" ? "rejected" : "pending";
   return (
-    <article className="cnl-stat-card">
-      <div className="cnl-stat-top">
-        <span>{label}</span>
-        <div className={`cnl-stat-icon ${tone}`}>
-          <Icon size={20} />
-        </div>
-      </div>
-      <strong>{value}</strong>
-      <small>{hint}</small>
-    </article>
+    <span className={`cnl-v2-status ${variant}`}>
+      <span className="cnl-v2-dot" />
+      {status(value)}
+    </span>
+  );
+}
+
+function Metric({ title, value, subtitle, icon: Icon, accent, index }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.07 }}
+    >
+      <Card className="cnl-v2-metric">
+        <CardContent className="cnl-v2-metric-inner">
+          <div className="cnl-v2-metric-top">
+            <span>{title}</span>
+            <span className={`cnl-v2-metric-icon ${accent}`}>
+              <Icon size={19} />
+            </span>
+          </div>
+          <strong>{value}</strong>
+          <small>{subtitle}</small>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+function StudentTable({ rows, showActions, onManage }) {
+  return (
+    <div className="cnl-v2-table-scroll">
+      <table className="cnl-v2-table">
+        <thead>
+          <tr>
+            <th>ÉTUDIANT</th>
+            <th>FORMATION</th>
+            <th>INSCRIPTION</th>
+            <th>MONTANT</th>
+            <th>PAIEMENT</th>
+            {showActions && <th>ACTION</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((item) => (
+            <tr key={item.id}>
+              <td>
+                <div className="cnl-v2-person">
+                  <span className="cnl-v2-person-avatar">
+                    {(item.prenom?.[0] || item.nom?.[0] || "E").toUpperCase()}
+                  </span>
+                  <span>
+                    <b>
+                      {item.prenom} {item.nom}
+                    </b>
+                    <small>{item.email || item.telephone || "—"}</small>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <b>{item.logiciel || item.formation_nom || "—"}</b>
+                <small className="cnl-v2-cell-sub">
+                  {item.filiere || item.offre || "—"}
+                </small>
+              </td>
+              <td>{dateLabel(item.created_at)}</td>
+              <td>
+                <b>{money(item.montant)}</b>
+              </td>
+              <td>
+                <StatusBadge value={item.statut_paiement} />
+              </td>
+              {showActions && (
+                <td>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onManage(item)}
+                  >
+                    Gérer <ChevronRight size={14} />
+                  </Button>
+                </td>
+              )}
+            </tr>
+          ))}
+          {!rows.length && (
+            <tr>
+              <td colSpan={showActions ? 6 : 5} className="cnl-v2-empty">
+                Aucune inscription ne correspond à votre recherche.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-
   const [section, setSection] = useState("overview");
-  const [mobileMenu, setMobileMenu] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [stats, setStats] = useState(null);
   const [inscriptions, setInscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,49 +188,36 @@ export default function AdminDashboard() {
   const [paymentProvider, setPaymentProvider] = useState("");
 
   const getToken = async () => {
-    const { data, error } = await supabase.auth.getSession();
-    if (error || !data.session?.access_token) {
+    const { data, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !data.session?.access_token)
       throw new Error("Session expirée. Reconnectez-vous.");
-    }
     return data.session.access_token;
   };
 
   const loadData = useCallback(async (initial = false) => {
     if (initial) setLoading(true);
     else setRefreshing(true);
-
     setError("");
-
     try {
       const token = await getToken();
       localStorage.setItem("access_token", token);
-
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-
+      const headers = { Authorization: `Bearer ${token}` };
       const [sr, ir] = await Promise.all([
         fetch(`${API}/api/admin/stats`, { headers }),
         fetch(`${API}/api/admin/inscriptions`, { headers }),
       ]);
-
       if (!sr.ok || !ir.ok) {
-        if (sr.status === 401 || ir.status === 401)
-          throw new Error("Session expirée.");
-        if (sr.status === 403 || ir.status === 403)
+        if ([sr.status, ir.status].includes(401))
+          throw new Error("Session expirée. Reconnectez-vous.");
+        if ([sr.status, ir.status].includes(403))
           throw new Error("Accès administrateur refusé.");
         throw new Error("Impossible de récupérer les données CNL.");
       }
-
-      const [sd, id] = await Promise.all([
-        sr.json(),
-        ir.json(),
-      ]);
-
+      const [sd, id] = await Promise.all([sr.json(), ir.json()]);
       setStats(sd.stats || null);
-      setInscriptions(id.inscriptions || []);
-    } catch (err) {
-      setError(err.message);
+      setInscriptions(Array.isArray(id.inscriptions) ? id.inscriptions : []);
+    } catch (e) {
+      setError(e.message || "Erreur de chargement.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -115,42 +230,54 @@ export default function AdminDashboard() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-
-    return inscriptions.filter((item) => {
+    return inscriptions.filter((i) => {
       const text = [
-        item.nom, item.prenom, item.email,
-        item.logiciel, item.formation_nom,
-        item.filiere,
-      ].join(" ").toLowerCase();
-
-      const matchStatus =
-        filter === "tous" || item.statut_paiement === filter;
-
-      return text.includes(q) && matchStatus;
+        i.nom,
+        i.prenom,
+        i.email,
+        i.telephone,
+        i.logiciel,
+        i.formation_nom,
+        i.filiere,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return (
+        text.includes(q) &&
+        (filter === "tous" || (i.statut_paiement || "en_attente") === filter)
+      );
     });
   }, [inscriptions, search, filter]);
 
-  const formations = useMemo(() => {
-    const counts = {};
-
-    inscriptions.forEach((item) => {
-      const name = item.logiciel || "Non renseigné";
-      counts[name] = (counts[name] || 0) + 1;
+  const formationData = useMemo(() => {
+    const counts = new Map();
+    inscriptions.forEach((i) => {
+      const name = i.logiciel || i.formation_nom || "Non renseigné";
+      counts.set(name, (counts.get(name) || 0) + 1);
     });
-
-    return Object.entries(counts)
+    return [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+      .slice(0, 6)
+      .map(([name, count]) => ({ name, count }));
   }, [inscriptions]);
 
-  const maxFormation = Math.max(
-    1, ...formations.map(([, count]) => count)
-  );
-
+  const goTo = (id) => {
+    setSection(id);
+    setMenuOpen(false);
+    setSearch("");
+    setFilter("tous");
+  };
+  const openPayment = (item) => {
+    setSelected(item);
+    setPaymentRef(item.reference_paiement || "");
+    setPaymentProvider(item.provider_paiement || "");
+    setError("");
+  };
   const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      const { error: e } = await supabase.auth.signOut();
+      if (e) throw e;
       localStorage.removeItem("access_token");
       navigate("/login", { replace: true });
     } catch {
@@ -158,26 +285,24 @@ export default function AdminDashboard() {
     }
   };
 
-  const updatePayment = async (status) => {
+  const updatePayment = async (nextStatus) => {
     if (!selected || processing) return;
-
-    if (status === "paye" && !paymentRef.trim()) {
+    if (nextStatus === "paye" && !paymentRef.trim()) {
       setError("Saisissez la référence du paiement vérifié.");
       return;
     }
-
-    const message = status === "paye"
-      ? "Confirmer que ce paiement a réellement été reçu ?"
-      : "Confirmer le refus de ce paiement ?";
-
-    if (!window.confirm(message)) return;
-
+    if (
+      !window.confirm(
+        nextStatus === "paye"
+          ? "Confirmer que ce paiement a réellement été reçu ?"
+          : "Confirmer le refus de ce paiement ?",
+      )
+    )
+      return;
     setProcessing(true);
     setError("");
-
     try {
       const token = await getToken();
-
       const response = await fetch(
         `${API}/api/admin/paiements/${selected.id}`,
         {
@@ -187,144 +312,68 @@ export default function AdminDashboard() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            statut_paiement: status,
+            statut_paiement: nextStatus,
             provider_paiement: paymentProvider.trim() || null,
             reference_paiement: paymentRef.trim() || null,
           }),
-        }
+        },
       );
-
       if (!response.ok) {
-        const result = await response.json().catch(() => ({}));
-        throw new Error(
-          result.message || "Mise à jour impossible."
-        );
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || "Mise à jour impossible.");
       }
-
       setSelected(null);
       setPaymentRef("");
       setPaymentProvider("");
       await loadData();
-    } catch (err) {
-      setError(err.message);
+    } catch (e) {
+      setError(e.message || "Erreur lors de la mise à jour.");
     } finally {
       setProcessing(false);
     }
   };
 
-  const openPayment = (item) => {
-    setSelected(item);
-    setPaymentRef(item.reference_paiement || "");
-    setPaymentProvider(item.provider_paiement || "");
-    setError("");
-  };
-
-  const navTo = (id) => {
-    setSection(id);
-    setMobileMenu(false);
-    setSearch("");
-    setFilter("tous");
-  };
-
-  const TableView = ({ rows, actions = false }) => (
-    <div className="cnl-table-wrap">
-      <table className="cnl-data-table">
-        <thead>
-          <tr>
-            <th>Étudiant</th>
-            <th>Formation</th>
-            <th>Offre</th>
-            <th>Montant</th>
-            <th>Paiement</th>
-            {actions && <th>Action</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((item) => (
-            <tr key={item.id}>
-              <td>
-                <div className="cnl-student-cell">
-                  <div className="cnl-student-avatar">
-                    {(item.prenom?.[0] || "E").toUpperCase()}
-                  </div>
-                  <div>
-                    <strong>{item.prenom} {item.nom}</strong>
-                    <small>{item.email}</small>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <strong>{item.logiciel || item.formation_nom || "—"}</strong>
-                <small>{item.filiere || "—"}</small>
-              </td>
-              <td>{item.offre || "—"}</td>
-              <td className="cnl-amount">{money(item.montant)}</td>
-              <td>
-                <span className={`cnl-status ${item.statut_paiement || "en_attente"}`}>
-                  <span className="cnl-status-dot" />
-                  {statusLabel(item.statut_paiement)}
-                </span>
-              </td>
-              {actions && (
-                <td>
-                  <button
-                    className="cnl-row-action"
-                    onClick={() => openPayment(item)}
-                  >
-                    Gérer <ChevronRight size={15} />
-                  </button>
-                </td>
-              )}
-            </tr>
-          ))}
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={actions ? 6 : 5} className="cnl-no-results">
-                Aucun résultat disponible.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-
+  const title =
+    section === "overview"
+      ? "Vue d'ensemble"
+      : section === "students"
+        ? "Gestion des étudiants"
+        : "Suivi des paiements";
   return (
-    <div className="cnl-premium-admin">
-      {mobileMenu && (
+    <div className="cnl-v2">
+      {menuOpen && (
         <button
-          className="cnl-mobile-overlay"
-          onClick={() => setMobileMenu(false)}
+          className="cnl-v2-overlay"
           aria-label="Fermer le menu"
+          onClick={() => setMenuOpen(false)}
         />
       )}
-
-      <aside className={`cnl-sidebar ${mobileMenu ? "open" : ""}`}>
-        <div className="cnl-sidebar-brand">
-          <div className="cnl-brand-icon">
-            <GraduationCap size={25} />
-          </div>
-          <div>
-            <strong>CNL<span>.</span></strong>
+      <aside className={`cnl-v2-sidebar ${menuOpen ? "is-open" : ""}`}>
+        <div className="cnl-v2-brand">
+          <span className="cnl-v2-brand-symbol">
+            <GraduationCap size={24} />
+          </span>
+          <span>
+            <b>
+              CNL<span className="cnl-v2-brand-period">.</span>
+            </b>
             <small>ADMINISTRATION</small>
-          </div>
+          </span>
           <button
-            className="cnl-close-menu"
-            onClick={() => setMobileMenu(false)}
+            className="cnl-v2-mobile-close"
+            onClick={() => setMenuOpen(false)}
             aria-label="Fermer"
           >
             <X size={20} />
           </button>
         </div>
-
-        <div className="cnl-sidebar-label">ESPACE DE TRAVAIL</div>
-
-        <nav className="cnl-side-nav">
-          {sections.map(({ id, label, icon: Icon }) => (
+        <div className="cnl-v2-nav-label">ESPACE DE TRAVAIL</div>
+        <nav className="cnl-v2-nav">
+          {navigation.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              className={`cnl-side-link ${section === id ? "active" : ""}`}
-              onClick={() => navTo(id)}
+              className={`cnl-v2-nav-item ${section === id ? "active" : ""}`}
+              onClick={() => goTo(id)}
             >
               <Icon size={19} />
               <span>{label}</span>
@@ -332,208 +381,276 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
-
-        <div className="cnl-sidebar-label cnl-sidebar-second">
+        <div className="cnl-v2-nav-label cnl-v2-nav-label-secondary">
           PROCHAINEMENT
         </div>
-
-        <div className="cnl-side-nav">
-          <div className="cnl-side-link disabled">
+        <div className="cnl-v2-nav">
+          <div className="cnl-v2-nav-item disabled">
             <BookOpen size={19} /> Formations & PDF
           </div>
-          <div className="cnl-side-link disabled">
+          <div className="cnl-v2-nav-item disabled">
             <Settings size={19} /> Paramètres
           </div>
         </div>
-
-        <div className="cnl-sidebar-bottom">
-          <div className="cnl-admin-identity">
-            <div className="cnl-identity-avatar">AD</div>
-            <div>
-              <strong>Administrateur</strong>
+        <div className="cnl-v2-sidebar-bottom">
+          <div className="cnl-v2-admin">
+            <span className="cnl-v2-admin-avatar">AD</span>
+            <span>
+              <b>Administrateur</b>
               <small>Accès sécurisé</small>
-            </div>
+            </span>
             <ShieldCheck size={18} />
           </div>
-          <button className="cnl-logout" onClick={logout}>
-            <LogOut size={18} /> Déconnexion
+          <button className="cnl-v2-logout" onClick={logout}>
+            <LogOut size={17} /> Déconnexion
           </button>
         </div>
       </aside>
-
-      <main className="cnl-main-area">
-        <header className="cnl-topbar">
-          <div className="cnl-topbar-left">
+      <div className="cnl-v2-main">
+        <header className="cnl-v2-topbar">
+          <div className="cnl-v2-breadcrumb">
             <button
-              className="cnl-menu-trigger"
-              onClick={() => setMobileMenu(true)}
+              className="cnl-v2-hamburger"
+              onClick={() => setMenuOpen(true)}
               aria-label="Ouvrir le menu"
             >
               <Menu size={22} />
             </button>
             <span>Administration</span>
-            <ChevronRight size={14} />
-            <strong>
-              {sections.find((s) => s.id === section)?.label}
-            </strong>
+            <ChevronRight size={15} />
+            <b>{title}</b>
           </div>
-          <div className="cnl-topbar-right">
-            <span className="cnl-live-pill">
+          <div className="cnl-v2-topright">
+            <span className="cnl-v2-secure">
               <span /> Espace sécurisé
             </span>
-            <div className="cnl-top-avatar">AD</div>
+            <span className="cnl-v2-top-avatar">AD</span>
           </div>
         </header>
-
-        <div className="cnl-content">
-          <div className="cnl-page-heading">
+        <main className="cnl-v2-content">
+          <div className="cnl-v2-heading">
             <div>
-              <span className="cnl-overline">CENTRE NATIONAL DE LEADERSHIP</span>
+              <div className="cnl-v2-kicker">
+                CENTRE NATIONAL DE LEADERSHIP <span> / </span> ESPACE ADMIN
+              </div>
               <h1>
-                {section === "overview" && "Vue d'ensemble"}
-                {section === "students" && "Gestion des étudiants"}
-                {section === "payments" && "Suivi des paiements"}
+                {title}
+                <span className="cnl-v2-heading-period">.</span>
               </h1>
               <p>
                 {section === "overview"
-                  ? "Bienvenue dans votre espace de pilotage."
-                  : "Consultez et gérez les données de votre centre."}
+                  ? "Une vision claire de l'activité de votre centre de formation."
+                  : section === "students"
+                    ? "Retrouvez et consultez les inscriptions enregistrées."
+                    : "Contrôlez et validez les règlements après vérification réelle."}
               </p>
             </div>
-            <button
-              className="cnl-refresh-btn"
+            <Button
+              variant="outline"
               onClick={() => loadData()}
               disabled={refreshing}
             >
-              <RefreshCw size={16} className={refreshing ? "cnl-spin" : ""} />
+              <RefreshCw
+                size={16}
+                className={refreshing ? "cnl-v2-spin" : ""}
+              />{" "}
               Actualiser
-            </button>
+            </Button>
           </div>
-
           {error && (
-            <div className="cnl-alert" role="alert">{error}</div>
+            <div className="cnl-v2-alert" role="alert">
+              {error}
+            </div>
           )}
-
           {loading ? (
-            <div className="cnl-loading">Chargement des données CNL...</div>
+            <div className="cnl-v2-loading">
+              <div className="cnl-v2-metrics">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-36 rounded-2xl" />
+                ))}
+              </div>
+              <Skeleton className="h-80 rounded-2xl" />
+            </div>
           ) : (
             <>
               {section === "overview" && (
                 <>
-                  <section className="cnl-stats-grid">
-                    <StatCard
-                      label="Total inscriptions"
+                  <div className="cnl-v2-metrics">
+                    <Metric
+                      index={0}
+                      title="Total inscriptions"
                       value={stats?.totalInscriptions ?? "—"}
+                      subtitle="Inscriptions enregistrées"
                       icon={Users}
-                      tone="blue"
-                      hint="Inscriptions enregistrées"
+                      accent="indigo"
                     />
-                    <StatCard
-                      label="Paiements en attente"
+                    <Metric
+                      index={1}
+                      title="Paiements en attente"
                       value={stats?.paiementsEnAttente ?? "—"}
+                      subtitle="À vérifier manuellement"
                       icon={Clock3}
-                      tone="amber"
-                      hint="À vérifier"
+                      accent="amber"
                     />
-                    <StatCard
-                      label="Paiements validés"
+                    <Metric
+                      index={2}
+                      title="Paiements validés"
                       value={stats?.paiementsValides ?? "—"}
+                      subtitle="Transactions confirmées"
                       icon={CircleCheck}
-                      tone="green"
-                      hint="Validations effectuées"
+                      accent="green"
                     />
-                    <StatCard
-                      label="Revenus validés"
+                    <Metric
+                      index={3}
+                      title="Revenus validés"
                       value={stats ? money(stats.revenusEncaisses) : "—"}
+                      subtitle="Selon les statuts validés"
                       icon={TrendingUp}
-                      tone="purple"
-                      hint="Selon les paiements marqués payés"
+                      accent="slate"
                     />
-                  </section>
-
-                  <div className="cnl-overview-grid">
-                    <section className="cnl-panel">
-                      <div className="cnl-panel-heading">
+                  </div>
+                  <div className="cnl-v2-overview-grid">
+                    <section className="cnl-v2-panel cnl-v2-chart-panel">
+                      <div className="cnl-v2-panel-heading">
                         <div>
-                          <span className="cnl-panel-eyebrow">ANALYSE</span>
+                          <span className="cnl-v2-eyebrow">
+                            ANALYSE DES INSCRIPTIONS
+                          </span>
                           <h2>Formations populaires</h2>
-                          <p>Répartition des inscriptions affichées</p>
+                          <p>Top 6 sur les inscriptions récupérées</p>
                         </div>
-                        <BookOpen size={20} />
+                        <span className="cnl-v2-panel-icon">
+                          <BookOpen size={19} />
+                        </span>
                       </div>
-
-                      <div className="cnl-bars">
-                        {formations.length === 0 && (
-                          <p>Aucune donnée disponible.</p>
-                        )}
-                        {formations.map(([name, count]) => (
-                          <div className="cnl-bar-item" key={name}>
-                            <div className="cnl-bar-meta">
-                              <span>{name}</span>
-                              <strong>{count}</strong>
-                            </div>
-                            <div className="cnl-bar-track">
-                              <div
-                                className="cnl-bar-fill"
-                                style={{
-                                  width: `${(count / maxFormation) * 100}%`
-                                }}
+                      {formationData.length ? (
+                        <div className="cnl-v2-chart">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={formationData}
+                              layout="vertical"
+                              margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
+                            >
+                              <CartesianGrid
+                                stroke="#edf0f3"
+                                horizontal={false}
                               />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                              <XAxis
+                                type="number"
+                                allowDecimals={false}
+                                tick={{ fontSize: 11, fill: "#9299a5" }}
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <YAxis
+                                dataKey="name"
+                                type="category"
+                                width={105}
+                                tick={{ fontSize: 11, fill: "#5b6677" }}
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <Tooltip
+                                formatter={(value) => [
+                                  `${value} inscription(s)`,
+                                  "Total",
+                                ]}
+                                cursor={{ fill: "#f4f6f9" }}
+                              />
+                              <Bar
+                                dataKey="count"
+                                radius={[0, 7, 7, 0]}
+                                barSize={18}
+                              >
+                                {formationData.map((entry, i) => (
+                                  <Cell
+                                    key={entry.name}
+                                    fill={
+                                      i === 0
+                                        ? "#283b60"
+                                        : i === 1
+                                          ? "#667da6"
+                                          : "#b5c1d2"
+                                    }
+                                  />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      ) : (
+                        <p className="cnl-v2-empty">
+                          Aucune donnée disponible pour le graphique.
+                        </p>
+                      )}
                     </section>
-
-                    <section className="cnl-panel cnl-quick-panel">
-                      <div className="cnl-panel-heading">
+                    <section className="cnl-v2-panel cnl-v2-shortcuts">
+                      <div className="cnl-v2-panel-heading">
                         <div>
-                          <span className="cnl-panel-eyebrow">ACCÈS RAPIDE</span>
+                          <span className="cnl-v2-eyebrow">RACCOURCIS</span>
                           <h2>Gestion quotidienne</h2>
+                          <p>Accédez rapidement aux opérations</p>
                         </div>
                       </div>
-                      <button onClick={() => navTo("students")}>
-                        <Users size={20} />
+                      <button onClick={() => goTo("students")}>
+                        <span className="cnl-v2-shortcut-icon">
+                          <Users size={20} />
+                        </span>
                         <span>
-                          <strong>Consulter les étudiants</strong>
-                          <small>Liste des inscriptions</small>
+                          <b>Consulter les étudiants</b>
+                          <small>Voir les dernières inscriptions</small>
                         </span>
                         <ArrowUpRight size={18} />
                       </button>
-                      <button onClick={() => navTo("payments")}>
-                        <Wallet size={20} />
+                      <button onClick={() => goTo("payments")}>
+                        <span className="cnl-v2-shortcut-icon">
+                          <Wallet size={20} />
+                        </span>
                         <span>
-                          <strong>Gérer les paiements</strong>
-                          <small>Validation manuelle</small>
+                          <b>Vérifier les paiements</b>
+                          <small>Validation manuelle sécurisée</small>
                         </span>
                         <ArrowUpRight size={18} />
                       </button>
+                      <div className="cnl-v2-info">
+                        <ShieldCheck size={18} />
+                        <span>
+                          Les paiements sont validés uniquement après
+                          vérification par un administrateur.
+                        </span>
+                      </div>
                     </section>
                   </div>
-
-                  <section className="cnl-panel">
-                    <div className="cnl-panel-heading">
+                  <section className="cnl-v2-panel cnl-v2-table-panel">
+                    <div className="cnl-v2-panel-heading">
                       <div>
-                        <span className="cnl-panel-eyebrow">ACTIVITÉ</span>
-                        <h2>Inscriptions récentes</h2>
+                        <span className="cnl-v2-eyebrow">ACTIVITÉ RÉCENTE</span>
+                        <h2>Dernières inscriptions</h2>
+                        <p>
+                          Les six inscriptions les plus récentes renvoyées par
+                          l'API
+                        </p>
                       </div>
-                      <button
-                        className="cnl-text-button"
-                        onClick={() => navTo("students")}
-                      >
+                      <Button variant="ghost" onClick={() => goTo("students")}>
                         Voir tout <ArrowUpRight size={16} />
-                      </button>
+                      </Button>
                     </div>
-                    <TableView rows={inscriptions.slice(0, 6)} />
+                    <StudentTable
+                      rows={inscriptions.slice(0, 6)}
+                      showActions={false}
+                    />
                   </section>
                 </>
               )}
-
               {(section === "students" || section === "payments") && (
-                <section className="cnl-panel">
-                  <div className="cnl-panel-heading">
+                <section className="cnl-v2-panel cnl-v2-table-panel">
+                  <div className="cnl-v2-panel-heading">
                     <div>
-                      <span className="cnl-panel-eyebrow">GESTION</span>
+                      <span className="cnl-v2-eyebrow">
+                        {section === "students"
+                          ? "ANNUAIRE"
+                          : "CONTRÔLE FINANCIER"}
+                      </span>
                       <h2>
                         {section === "students"
                           ? "Liste des étudiants"
@@ -541,21 +658,24 @@ export default function AdminDashboard() {
                       </h2>
                       <p>{filtered.length} résultat(s) affiché(s)</p>
                     </div>
+                    <Badge variant="outline">
+                      {inscriptions.length} dossiers chargés
+                    </Badge>
                   </div>
-
-                  <div className="cnl-filters">
-                    <div className="cnl-search-field">
-                      <Search size={18} />
-                      <input
-                        placeholder="Rechercher un étudiant, une formation..."
+                  <div className="cnl-v2-filters">
+                    <label className="cnl-v2-search">
+                      <Search size={17} />
+                      <Input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Rechercher un nom, email, formation..."
+                        aria-label="Rechercher"
                       />
-                    </div>
+                    </label>
                     <select
+                      aria-label="Filtrer par statut"
                       value={filter}
                       onChange={(e) => setFilter(e.target.value)}
-                      aria-label="Filtrer par statut"
                     >
                       <option value="tous">Tous les statuts</option>
                       <option value="en_attente">En attente</option>
@@ -563,100 +683,106 @@ export default function AdminDashboard() {
                       <option value="refuse">Refusés</option>
                     </select>
                   </div>
-
-                  <TableView
+                  <StudentTable
                     rows={filtered}
-                    actions={section === "payments"}
+                    showActions={section === "payments"}
+                    onManage={openPayment}
                   />
-                  <p className="cnl-table-note">
-                    Affichage limité aux 100 dernières inscriptions
-                    renvoyées par l'API.
+                  <p className="cnl-v2-footnote">
+                    Liste limitée aux 100 dernières inscriptions renvoyées par
+                    l'API.
                   </p>
                 </section>
               )}
             </>
           )}
-        </div>
-      </main>
-
-      {selected && (
-        <div className="cnl-modal-backdrop">
-          <div
-            className="cnl-payment-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cnl-payment-title"
-          >
-            <div className="cnl-modal-header">
-              <div>
-                <span className="cnl-overline">ADMINISTRATION CNL</span>
-                <h2 id="cnl-payment-title">Vérifier un paiement</h2>
+        </main>
+      </div>
+      <Dialog
+        open={Boolean(selected)}
+        onOpenChange={(open) => {
+          if (!open && !processing) {
+            setSelected(null);
+            setError("");
+          }
+        }}
+      >
+        <DialogContent
+          className="cnl-v2-dialog sm:max-w-[510px]"
+          onInteractOutside={(event) => {
+            if (processing) event.preventDefault();
+          }}
+          onEscapeKeyDown={(event) => {
+            if (processing) event.preventDefault();
+          }}
+        >
+          <DialogHeader>
+            <div className="cnl-v2-eyebrow">ADMINISTRATION CNL</div>
+            <DialogTitle>Vérifier un paiement</DialogTitle>
+            <DialogDescription>
+              Vérifiez la réception effective des fonds avant toute validation.
+            </DialogDescription>
+          </DialogHeader>
+          {selected && (
+            <>
+              <div className="cnl-v2-payment-details">
+                <span>Étudiant</span>
+                <b>
+                  {selected.prenom} {selected.nom}
+                </b>
+                <span>Formation</span>
+                <b>{selected.logiciel || selected.formation_nom || "—"}</b>
+                <span>Montant attendu</span>
+                <b>{money(selected.montant)}</b>
+                <span>Statut actuel</span>
+                <b>{status(selected.statut_paiement)}</b>
               </div>
-              <button
-                onClick={() => setSelected(null)}
-                aria-label="Fermer"
-                disabled={processing}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="cnl-payment-summary">
-              <span>Étudiant</span>
-              <strong>{selected.prenom} {selected.nom}</strong>
-              <span>Formation</span>
-              <strong>{selected.logiciel || "—"}</strong>
-              <span>Montant attendu</span>
-              <strong>{money(selected.montant)}</strong>
-              <span>Statut actuel</span>
-              <strong>{statusLabel(selected.statut_paiement)}</strong>
-            </div>
-
-            <label className="cnl-modal-label">
-              Moyen de paiement
-              <input
-                value={paymentProvider}
-                onChange={(e) => setPaymentProvider(e.target.value)}
-                placeholder="Ex. MTN MoMo, Airtel Money, espèces"
-              />
-            </label>
-
-            <label className="cnl-modal-label">
-              Référence du paiement vérifié
-              <input
-                value={paymentRef}
-                onChange={(e) => setPaymentRef(e.target.value)}
-                placeholder="Référence de transaction ou reçu"
-              />
-            </label>
-
-            <p className="cnl-modal-warning">
-              Vérifiez réellement le paiement avant validation.
-              Le statut ne constitue pas une preuve bancaire.
-            </p>
-
-            {error && <p className="cnl-alert">{error}</p>}
-
-            <div className="cnl-modal-actions">
-              <button
-                className="cnl-refuse-btn"
-                disabled={processing}
-                onClick={() => updatePayment("refuse")}
-              >
-                <Ban size={17} /> Refuser
-              </button>
-              <button
-                className="cnl-approve-btn"
-                disabled={processing}
-                onClick={() => updatePayment("paye")}
-              >
-                <Check size={17} />
-                {processing ? "Traitement..." : "Valider le paiement"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <label className="cnl-v2-field">
+                Moyen de paiement
+                <Input
+                  disabled={processing}
+                  value={paymentProvider}
+                  onChange={(e) => setPaymentProvider(e.target.value)}
+                  placeholder="MTN MoMo, Airtel Money, espèces..."
+                />
+              </label>
+              <label className="cnl-v2-field">
+                Référence du paiement vérifié
+                <Input
+                  disabled={processing}
+                  value={paymentRef}
+                  onChange={(e) => setPaymentRef(e.target.value)}
+                  placeholder="Référence de transaction ou reçu"
+                />
+              </label>
+              <p className="cnl-v2-warning">
+                Un statut « Payé » ne constitue pas une preuve bancaire.
+              </p>
+              {error && (
+                <p className="cnl-v2-alert" role="alert">
+                  {error}
+                </p>
+              )}
+              <DialogFooter className="cnl-v2-dialog-actions">
+                <Button
+                  variant="outline"
+                  disabled={processing}
+                  onClick={() => updatePayment("refuse")}
+                >
+                  <Ban size={16} /> Refuser
+                </Button>
+                <Button
+                  disabled={processing}
+                  onClick={() => updatePayment("paye")}
+                >
+                  <Check size={16} />
+                  {processing ? "Traitement..." : "Valider le paiement"}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
