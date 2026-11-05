@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../config/supabase";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import {
   AreaChart,
   Area,
@@ -28,7 +28,6 @@ import {
   TrendingUp,
   Clock3,
   CircleCheck,
-  GraduationCap,
   ChevronRight,
   ShieldCheck,
   Check,
@@ -36,27 +35,19 @@ import {
   ArrowUpRight,
   Sun,
   Moon,
-  Bell,
   Download,
   CalendarDays,
   Building2,
   ArrowRight,
-  MoreHorizontal,
   ChevronLeft,
-  ChevronDown,
   ChartNoAxesCombined,
   ClipboardList,
   LockKeyhole,
-  Mail,
-  Phone,
-  MapPin,
   AlertCircle,
   Eye,
-  Layers3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -107,7 +98,7 @@ const futureNavigation = [
   { label: "Paramètres", Icon: Settings },
 ];
 const PALETTE = [
-  "#3976f6",
+  "#0b7f88",
   "#7667f5",
   "#24bea3",
   "#f4af48",
@@ -115,29 +106,14 @@ const PALETTE = [
   "#e16d9b",
 ];
 
-function getChartData(items, months = 6) {
-  const now = new Date();
-  const result = Array.from({ length: months }, (_, index) => {
-    const d = new Date(
-      now.getFullYear(),
-      now.getMonth() - (months - index - 1),
-      1,
-    );
-    return {
-      key: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
-      name: d.toLocaleDateString("fr-FR", { month: "short" }),
-      inscriptions: 0,
-    };
+// Transforme une clé de mois (AAAA-MM) en libellé français pour le graphique.
+function formatMonthLabel(monthKey) {
+  const [year, month] = String(monthKey || "").split("-").map(Number);
+  if (!year || !month) return "—";
+
+  return new Date(year, month - 1, 1).toLocaleDateString("fr-FR", {
+    month: "short",
   });
-  const byKey = new Map(result.map((entry) => [entry.key, entry]));
-  items.forEach((item) => {
-    if (!item.created_at) return;
-    const d = new Date(item.created_at);
-    if (Number.isNaN(d.getTime())) return;
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    if (byKey.has(key)) byKey.get(key).inscriptions++;
-  });
-  return result;
 }
 
 function StatusPill({ status }) {
@@ -282,20 +258,32 @@ function SectionHeader({ eyebrow, title, description, actions }) {
   );
 }
 
-function EnrollmentChart({ items, total }) {
+/**
+ * Graphique mensuel global.
+ * Les chiffres viennent du backend (agrégés directement dans PostgreSQL),
+ * et non de la seule page d'étudiants actuellement affichée.
+ */
+function EnrollmentChart({ monthly = [], total }) {
   const [period, setPeriod] = useState(6);
-  const data = useMemo(() => getChartData(items, period), [items, period]);
+
+  const data = useMemo(() => {
+    return monthly.slice(-period).map((entry) => ({
+      ...entry,
+      name: formatMonthLabel(entry.key),
+    }));
+  }, [monthly, period]);
+
   return (
     <div className="executive-panel executive-enrollment">
       <SectionHeader
         eyebrow="ANALYSE"
         title="Évolution des inscriptions"
-        description="Inscriptions par mois selon les dates enregistrées"
+        description="Historique global des inscriptions enregistrées"
         actions={
           <select
             className="executive-period"
             value={period}
-            onChange={(e) => setPeriod(Number(e.target.value))}
+            onChange={(event) => setPeriod(Number(event.target.value))}
             aria-label="Période du graphique"
           >
             <option value={6}>6 mois</option>
@@ -303,10 +291,12 @@ function EnrollmentChart({ items, total }) {
           </select>
         }
       />
+
       <div className="executive-chart-total">
         <strong>{number(total)}</strong>
-        <span>inscription(s) au total selon l'API</span>
+        <span>inscription(s) au total</span>
       </div>
+
       <div
         className="executive-chart-area"
         role="img"
@@ -367,33 +357,45 @@ function EnrollmentChart({ items, total }) {
           </AreaChart>
         </ResponsiveContainer>
       </div>
+
       <p className="executive-quiet-note">
-        Historique calculé sur les inscriptions chargées (100 maximum
-        actuellement).
+        Analyse calculée sur l'ensemble des inscriptions de la base.
       </p>
     </div>
   );
 }
 
-function PopularChart({ items }) {
+/**
+ * Répartition globale des formations.
+ * L'API fournit une liste agrégée pour toutes les inscriptions.
+ */
+function PopularChart({ items = [] }) {
   const { segments, total } = useMemo(() => {
-    const counts = new Map();
-    items.forEach((item) => {
-      const key = item.logiciel || item.formation_nom || "Non renseigné";
-      counts.set(key, (counts.get(key) || 0) + 1);
-    });
-    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-    const top = sorted.slice(0, 5).map(([name, value]) => ({ name, value }));
-    const rest = sorted.slice(5).reduce((sum, [, value]) => sum + value, 0);
+    const sorted = [...items]
+      .map((item) => ({
+        name: item.name || "Non renseigné",
+        value: Number(item.value) || 0,
+      }))
+      .filter((item) => item.value > 0)
+      .sort((a, b) => b.value - a.value);
+
+    const top = sorted.slice(0, 5);
+    const rest = sorted.slice(5).reduce((sum, item) => sum + item.value, 0);
+
     if (rest > 0) top.push({ name: "Autres", value: rest });
-    return { segments: top, total: items.length };
+
+    return {
+      segments: top,
+      total: sorted.reduce((sum, item) => sum + item.value, 0),
+    };
   }, [items]);
+
   return (
     <div className="executive-panel executive-popular">
       <SectionHeader
         eyebrow="FORMATIONS"
         title="Formations populaires"
-        description="Répartition des inscriptions récupérées"
+        description="Répartition globale des inscriptions"
       />
       {total ? (
         <div className="executive-donut-layout">
@@ -409,11 +411,14 @@ function PopularChart({ items }) {
                   paddingAngle={3}
                   stroke="none"
                 >
-                  {segments.map((s, i) => (
-                    <Cell key={s.name} fill={PALETTE[i % PALETTE.length]} />
+                  {segments.map((segment, index) => (
+                    <Cell
+                      key={segment.name}
+                      fill={PALETTE[index % PALETTE.length]}
+                    />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v) => [`${v} inscription(s)`, "Nombre"]} />
+                <Tooltip formatter={(value) => [`${value} inscription(s)`, "Nombre"]} />
               </PieChart>
             </ResponsiveContainer>
             <div className="executive-donut-center">
@@ -422,14 +427,14 @@ function PopularChart({ items }) {
             </div>
           </div>
           <div className="executive-legend">
-            {segments.map((s, i) => (
-              <div className="executive-legend-row" key={s.name}>
+            {segments.map((segment, index) => (
+              <div className="executive-legend-row" key={segment.name}>
                 <span
                   className="executive-legend-dot"
-                  style={{ background: PALETTE[i % PALETTE.length] }}
+                  style={{ background: PALETTE[index % PALETTE.length] }}
                 />
-                <span title={s.name}>{s.name}</span>
-                <strong>{Math.round((s.value / total) * 100)} %</strong>
+                <span title={segment.name}>{segment.name}</span>
+                <strong>{Math.round((segment.value / total) * 100)} %</strong>
               </div>
             ))}
           </div>
@@ -443,49 +448,63 @@ function PopularChart({ items }) {
   );
 }
 
+/**
+ * Tableau des inscriptions.
+ * Important : il n'effectue plus de découpage local avec Array.slice().
+ * Il affiche la page renvoyée par le backend et lui demande la suivante.
+ */
 function StudentsTable({
   rows,
   onPayment,
+  onViewStudent,
   enableActions = false,
   showControls = false,
-  totalCount,
+  totalCount = 0,
+  pagination = null,
+  onPageChange,
+  onPageSizeChange,
   onExport,
+  exporting = false,
 }) {
-  const [pageSize, setPageSize] = useState(10);
-  const [page, setPage] = useState(1);
-  const maxPage = Math.max(1, Math.ceil(rows.length / pageSize));
-  const currentPage = Math.min(page, maxPage);
-  const visible = rows.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
+  const currentPage = pagination?.page || 1;
+  const pageSize = pagination?.limit || 20;
+  const totalPages = pagination?.totalPages || 1;
+  const total = Number(totalCount) || 0;
+  const firstRow = total ? (currentPage - 1) * pageSize + 1 : 0;
+  const lastRow = Math.min(currentPage * pageSize, total);
+
   return (
     <>
       {showControls && (
         <div className="executive-table-controls">
-          <span>{rows.length} résultat(s) dans les données chargées</span>
+          <span>{number(total)} résultat(s) correspondant aux filtres</span>
           <div>
-            <Button variant="outline" size="sm" onClick={onExport}>
-              <Download size={14} /> Exporter CSV
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onExport}
+              disabled={exporting || total === 0}
+            >
+              <Download size={14} />
+              {exporting ? "Préparation..." : "Exporter CSV"}
             </Button>
             <label>
               Par page{" "}
               <select
                 value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPage(1);
-                }}
+                onChange={(event) => onPageSizeChange(Number(event.target.value))}
+                aria-label="Nombre d'étudiants par page"
               >
-                <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
             </label>
           </div>
         </div>
       )}
+
       <div className="executive-table-scroll">
         <table className="executive-table">
           <thead>
@@ -496,11 +515,11 @@ function StudentsTable({
               <th>MONTANT</th>
               <th>PAIEMENT</th>
               <th>INSCRIPTION</th>
-              {enableActions && <th>ACTION</th>}
+              
             </tr>
           </thead>
           <tbody>
-            {visible.map((item) => (
+            {rows.map((item) => (
               <tr key={item.id}>
                 <td>
                   <div className="executive-student">
@@ -529,22 +548,37 @@ function StudentsTable({
                   {formatDate(item.created_at)}
                   <small>{formatTime(item.created_at)}</small>
                 </td>
-                {enableActions && (
-                  <td>
-                    <button
-                      className="executive-row-button"
-                      onClick={() => onPayment(item)}
-                      title="Examiner le paiement"
-                    >
-                      <Eye size={16} /> Gérer
-                    </button>
-                  </td>
-                )}
+                {(enableActions || onViewStudent) && (
+  <td>
+    <div className="executive-row-actions">
+      {onViewStudent && (
+        <button
+          className="executive-row-button"
+          onClick={() => onViewStudent(item)}
+          title="Consulter la fiche de cet étudiant"
+        >
+          <BookOpen size={16} /> Fiche
+        </button>
+      )}
+
+      {enableActions && (
+        <button
+          className="executive-row-button"
+          onClick={() => onPayment(item)}
+          title="Examiner le paiement"
+        >
+          <Eye size={16} /> Gérer
+        </button>
+      )}
+    </div>
+  </td>
+)}
               </tr>
             ))}
-            {!visible.length && (
+
+            {!rows.length && (
               <tr>
-                <td colSpan={enableActions ? 7 : 6} className="executive-empty">
+                <td colSpan={enableActions || onViewStudent ? 7 : 6} className="executive-empty">
                   Aucune inscription correspondant à vos critères.
                 </td>
               </tr>
@@ -552,35 +586,33 @@ function StudentsTable({
           </tbody>
         </table>
       </div>
-      <div className="executive-table-footer">
-        <span>
-          {rows.length
-            ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, rows.length)} sur ${rows.length}`
-            : "0 résultat"}
-          {typeof totalCount === "number" && totalCount > rows.length
-            ? ` · ${number(totalCount)} au total (API limitée)`
-            : ""}
-        </span>
-        <div className="executive-pages">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setPage(currentPage - 1)}
-            aria-label="Page précédente"
-          >
-            <ChevronLeft size={16} />
-          </button>
+
+      {showControls && pagination && (
+        <div className="executive-table-footer">
           <span>
-            Page {currentPage} / {maxPage}
+            {firstRow}–{lastRow} sur {number(total)} inscription(s)
           </span>
-          <button
-            disabled={currentPage >= maxPage}
-            onClick={() => setPage(currentPage + 1)}
-            aria-label="Page suivante"
-          >
-            <ChevronRight size={16} />
-          </button>
+          <div className="executive-pages">
+            <button
+              disabled={!pagination.hasPreviousPage}
+              onClick={() => onPageChange(currentPage - 1)}
+              aria-label="Page précédente"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span>
+              Page {number(currentPage)} / {number(totalPages)}
+            </span>
+            <button
+              disabled={!pagination.hasNextPage}
+              onClick={() => onPageChange(currentPage + 1)}
+              aria-label="Page suivante"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
@@ -669,117 +701,255 @@ function exportCSV(items) {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+
+  // --------------------------------------------------
+  // ÉTAT DE L'INTERFACE
+  // Ces valeurs contrôlent l'affichage, les filtres et la pagination.
+  // --------------------------------------------------
   const [theme, setTheme] = useState(() => {
     try {
-      return localStorage.getItem("cnl-admin-theme") === "dark"
-        ? "dark"
-        : "light";
+      return localStorage.getItem("cnl-admin-theme") === "dark" ? "dark" : "light";
     } catch {
       return "light";
     }
   });
+
   const [section, setSection] = useState("overview");
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [filter, setFilter] = useState("tous");
+
+  // Pagination pilotée par l'API (et non par un découpage local du tableau).
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+  // --------------------------------------------------
+  // DONNÉES ET ÉTATS DE CHARGEMENT
+  // --------------------------------------------------
   const [stats, setStats] = useState(null);
+  const [analytics, setAnalytics] = useState({ monthly: [], popular: [] });
   const [inscriptions, setInscriptions] = useState([]);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("tous");
+  const hasLoadedOnce = useRef(false);
+  const latestRequestId = useRef(0);
+
+  // --------------------------------------------------
+  // ÉTAT DE LA FENÊTRE DE VALIDATION DE PAIEMENT
+  // --------------------------------------------------
   const [selected, setSelected] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [paymentRef, setPaymentRef] = useState("");
   const [paymentProvider, setPaymentProvider] = useState("");
+
+  // Mémorise le thème choisi sur cet ordinateur.
   useEffect(() => {
     try {
       localStorage.setItem("cnl-admin-theme", theme);
     } catch {
-      /* stockage inaccessible */
+      // Le tableau de bord reste utilisable si le stockage est indisponible.
     }
   }, [theme]);
 
-  const getToken = async () => {
+  // Évite d'envoyer une requête à chaque caractère saisi.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  // --------------------------------------------------
+  // AUTHENTIFICATION : récupère le jeton de session Supabase.
+  // Le backend vérifie ensuite le rôle administrateur.
+  // --------------------------------------------------
+  const getToken = useCallback(async () => {
     const { data, error: authError } = await supabase.auth.getSession();
-    if (authError || !data.session?.access_token)
+
+    if (authError || !data.session?.access_token) {
       throw new Error("Session expirée. Reconnectez-vous.");
+    }
+
     setEmail(data.session.user?.email || "");
     return data.session.access_token;
-  };
+  }, []);
 
-  const loadData = useCallback(async (initial = false) => {
-    if (initial) setLoading(true);
-    else setRefreshing(true);
+  // --------------------------------------------------
+  // CHARGEMENT DU DASHBOARD
+  // Charge les statistiques globales et une seule page d'inscriptions.
+  // --------------------------------------------------
+  const loadData = useCallback(async () => {
+    // Un identifiant empêche une réponse réseau ancienne d'écraser la plus récente.
+    const requestId = ++latestRequestId.current;
+
+    if (hasLoadedOnce.current) setRefreshing(true);
+    else setLoading(true);
+
     setError("");
+
     try {
-      const { data, error: authError } = await supabase.auth.getSession();
-      if (authError || !data.session?.access_token)
-        throw new Error("Session expirée. Reconnectez-vous.");
-      setEmail(data.session.user?.email || "");
-      const token = data.session.access_token;
-      localStorage.setItem("access_token", token);
+      const token = await getToken();
+      try {
+        localStorage.setItem("access_token", token);
+      } catch {
+        // Le jeton reste utilisé dans l'en-tête même si le stockage est bloqué.
+      }
+
       const headers = { Authorization: `Bearer ${token}` };
-      const [sr, ir] = await Promise.all([
+
+      // Prépare les paramètres envoyés au backend.
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(pageSize),
+      });
+
+      if (debouncedSearch) params.set("q", debouncedSearch);
+      if (filter !== "tous") params.set("statut_paiement", filter);
+
+      // Les statistiques restent globales ; la liste est paginée et filtrée.
+      const [statsResponse, listResponse] = await Promise.all([
         fetch(`${API}/api/admin/stats`, { headers }),
-        fetch(`${API}/api/admin/inscriptions`, { headers }),
+        fetch(`${API}/api/admin/inscriptions?${params.toString()}`, { headers }),
       ]);
-      if (!sr.ok || !ir.ok) {
-        if ([sr.status, ir.status].includes(401))
+
+      if (!statsResponse.ok || !listResponse.ok) {
+        const statusCode = !statsResponse.ok
+          ? statsResponse.status
+          : listResponse.status;
+
+        if (statusCode === 401) {
           throw new Error("Session expirée. Reconnectez-vous.");
-        if ([sr.status, ir.status].includes(403))
+        }
+
+        if (statusCode === 403) {
           throw new Error("Accès administrateur refusé.");
+        }
+
+        throw new Error("Impossible de récupérer les données administrateur CNL.");
+      }
+
+      const [statsData, listData] = await Promise.all([
+        statsResponse.json(),
+        listResponse.json(),
+      ]);
+
+      // Une pagination absente indique que l'ancienne route backend est encore active.
+      if (!listData.pagination || !Array.isArray(listData.inscriptions)) {
         throw new Error(
-          "Impossible de récupérer les données administrateur CNL.",
+          "L'API utilise encore l'ancienne version. Remplacez admin.routes.js par la version paginée.",
         );
       }
-      const [sd, id] = await Promise.all([sr.json(), ir.json()]);
-      setStats(sd.stats || null);
-      setInscriptions(Array.isArray(id.inscriptions) ? id.inscriptions : []);
-    } catch (err) {
-      setError(err.message || "Erreur de chargement.");
+
+      // Ignore cette réponse si une recherche ou une page plus récente est déjà partie.
+      if (requestId !== latestRequestId.current) return;
+
+      setStats(statsData.stats || null);
+      setAnalytics(statsData.analytics || { monthly: [], popular: [] });
+      setInscriptions(listData.inscriptions);
+      setPagination(listData.pagination);
+    } catch (loadError) {
+      if (requestId === latestRequestId.current) {
+        setError(loadError.message || "Erreur de chargement des données.");
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (requestId === latestRequestId.current) {
+        hasLoadedOnce.current = true;
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
-  }, []);
+  }, [getToken, page, pageSize, debouncedSearch, filter]);
+
+  // Recharge automatiquement les données quand la page ou les filtres changent.
   useEffect(() => {
-    loadData(true);
+    loadData();
   }, [loadData]);
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLocaleLowerCase("fr");
-    return inscriptions.filter((item) => {
-      const fields = [
-        item.nom,
-        item.prenom,
-        item.email,
-        item.logiciel,
-        item.formation_nom,
-        item.filiere,
-        item.telephone,
-      ]
-        .join(" ")
-        .toLocaleLowerCase("fr");
-      return (
-        fields.includes(q) &&
-        (filter === "tous" || (item.statut_paiement || "en_attente") === filter)
-      );
-    });
-  }, [inscriptions, search, filter]);
-  const sorted = useMemo(
-    () =>
-      [...inscriptions].sort(
-        (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
-      ),
-    [inscriptions],
-  );
+  // Le backend effectue déjà la recherche, le filtre et le tri.
+  // Ces alias gardent le reste du JSX lisible sans refaire le filtrage local.
+  const filtered = inscriptions;
+  const sorted = inscriptions;
+
   const navigateSection = (id) => {
     setSection(id);
     setMobileMenu(false);
     setSearch("");
+    setDebouncedSearch("");
     setFilter("tous");
+    setPage(1);
   };
+  // Exporte toutes les inscriptions correspondant aux filtres actuels.
+  // Chaque appel récupère 100 lignes ; on parcourt toutes les pages du serveur.
+  const exportAllFiltered = async () => {
+    if (exporting) return;
+
+    setExporting(true);
+    setError("");
+
+    try {
+      const token = await getToken();
+      const headers = { Authorization: `Bearer ${token}` };
+      const allRows = [];
+      let currentExportPage = 1;
+      let totalPages = 1;
+
+      do {
+        const params = new URLSearchParams({
+          page: String(currentExportPage),
+          limit: "100",
+        });
+
+        // Utilise les valeurs visibles dans les champs de recherche et de filtre.
+        if (search.trim()) params.set("q", search.trim());
+        if (filter !== "tous") params.set("statut_paiement", filter);
+
+        const response = await fetch(
+          `${API}/api/admin/inscriptions?${params.toString()}`,
+          { headers },
+        );
+
+        if (!response.ok) {
+          throw new Error("Impossible de préparer l'export des inscriptions.");
+        }
+
+        const result = await response.json();
+
+        if (!result.pagination || !Array.isArray(result.inscriptions)) {
+          throw new Error("La réponse de l'API ne contient pas la pagination attendue.");
+        }
+
+        allRows.push(...result.inscriptions);
+        totalPages = result.pagination.totalPages;
+        currentExportPage += 1;
+      } while (currentExportPage <= totalPages);
+
+      if (!allRows.length) {
+        setError("Aucune inscription à exporter pour ces critères.");
+        return;
+      }
+
+      exportCSV(allRows);
+    } catch (exportError) {
+      setError(exportError.message || "Erreur pendant l'export CSV.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const logout = async () => {
     try {
       const { error: authError } = await supabase.auth.signOut();
@@ -796,6 +966,15 @@ export default function AdminDashboard() {
     setPaymentProvider(item.provider_paiement || "");
     setError("");
   };
+  // Ouvre la fiche détaillée de l'étudiant sélectionné.
+const openStudentProfile = (item) => {
+  if (!item?.id) {
+    setError("Identifiant de l'étudiant introuvable.");
+    return;
+  }
+
+  navigate(`/admin/inscriptions/${item.id}`);
+};
   const updatePayment = async (status) => {
     if (!selected || processing) return;
     if (status === "paye" && !paymentRef.trim()) {
@@ -878,6 +1057,7 @@ export default function AdminDashboard() {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
+                setPage(1);
                 if (e.target.value.trim()) setSection("students");
               }}
             />
@@ -1012,10 +1192,10 @@ export default function AdminDashboard() {
                   </section>
                   <div className="executive-dashboard-grid">
                     <EnrollmentChart
-                      items={inscriptions}
-                      total={stats?.totalInscriptions ?? inscriptions.length}
+                      monthly={analytics.monthly || []}
+                      total={stats?.totalInscriptions ?? pagination.total}
                     />
-                    <PopularChart items={inscriptions} />
+                    <PopularChart items={analytics.popular || []} />
                     <div className="executive-promo">
                       <span>CNL · GÉNIE CIVIL</span>
                       <h3>Une formation d'excellence.</h3>
@@ -1044,6 +1224,7 @@ export default function AdminDashboard() {
                         totalCount={stats?.totalInscriptions}
                         enableActions
                         onPayment={openPayment}
+                        onViewStudent={openStudentProfile}
                       />
                     </div>
                     <div className="executive-right-stack">
@@ -1065,11 +1246,11 @@ export default function AdminDashboard() {
                             </span>
                             Voir les paiements <ArrowRight size={15} />
                           </button>
-                          <button onClick={() => exportCSV(inscriptions)}>
+                          <button onClick={exportAllFiltered} disabled={exporting}>
                             <span>
                               <Download size={19} />
                             </span>
-                            Exporter les inscriptions <ArrowRight size={15} />
+                            {exporting ? "Préparation de l'export..." : "Exporter les inscriptions"} <ArrowRight size={15} />
                           </button>
                         </div>
                       </div>
@@ -1118,8 +1299,7 @@ export default function AdminDashboard() {
                         : "Suivi des transactions"}
                     </h2>
                     <p>
-                      {filtered.length} inscription(s) dans les résultats
-                      chargés
+                      {number(pagination.total)} inscription(s) correspondant aux critères
                     </p>
                   </div>
                   <div className="executive-manage-filters">
@@ -1134,7 +1314,10 @@ export default function AdminDashboard() {
                     </label>
                     <select
                       value={filter}
-                      onChange={(e) => setFilter(e.target.value)}
+                      onChange={(e) => {
+                        setFilter(e.target.value);
+                        setPage(1);
+                      }}
                       aria-label="Filtrer les paiements"
                     >
                       <option value="tous">Tous les statuts</option>
@@ -1148,18 +1331,25 @@ export default function AdminDashboard() {
                   <div className="executive-loader">Chargement...</div>
                 ) : (
                   <StudentsTable
-                    key={`${section}-${filter}-${search}`}
                     rows={filtered}
-                    totalCount={stats?.totalInscriptions}
+                    totalCount={pagination.total}
+                    pagination={pagination}
+                    onPageChange={setPage}
+                    onPageSizeChange={(size) => {
+                      setPageSize(size);
+                      setPage(1);
+                    }}
                     enableActions={section === "payments"}
                     onPayment={openPayment}
                     showControls
-                    onExport={() => exportCSV(filtered)}
+                    onExport={exportAllFiltered}
+                    exporting={exporting}
+                    onViewStudent={openStudentProfile}
                   />
                 )}
                 <p className="executive-quiet-note">
-                  Important : la liste et la pagination portent sur les 100
-                  dernières inscriptions fournies par l'API actuelle.
+                  Pagination côté serveur : les pages sont chargées directement depuis Supabase.
+                  Les filtres et l'export CSV portent sur l'ensemble des résultats correspondants.
                 </p>
               </section>
             </>
